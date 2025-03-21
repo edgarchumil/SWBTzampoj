@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmaciones - Sistema Parroquial</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/confirmacion.css">
+    <script src="js/auth.js"></script>
+    <!-- Replace the existing jsPDF script tags with these -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script>
+        window.jsPDF = window.jspdf.jsPDF;
+    </script>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar-toggle" id="sidebarToggle">
+            <span class="toggle-icon">☰</span>
+        </div>
+        <aside class="sidebar" id="sidebar">
+            <div class="logo-container">
+                <img src="img/logo.png" alt="Logo Parroquia">
+                <h2>Parroquia Nuestra Señora de Lourdes</h2>
+                <p class="parish-info">Aldea Tzampoj, Sololá<br>Tel: +502 3169-7846</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="./dashboard.html">Inicio</a></li>
+                <li><a href="./bautismos.html">Bautismos</a></li>
+                <li><a href="./comuniones.html">Comuniones</a></li>
+                <li><a href="#" class="active">Confirmaciones</a></li>
+                <li><a href="./matrimonios.html">Matrimonios</a></li>
+            </ul>
+        </aside>
+
+        <div class="main-content">
+            <header class="header">
+                <h1></h1>
+                <div class="user-info">
+                    <img src="./img/user-avatar.png" alt="Usuario">
+                    <span id="username"></span>
+                    <button id="logout">Cerrar Sesión</button>
+                </div>
+            </header>
+
+            <div class="content">
+                <h1 style="color:#000035;" >Registro, Confirmaciones</h1>
+                <div class="content-header">
+                    <div class="search-section">
+                        <input type="text" id="searchInput" placeholder="Buscar por nombre...">
+                        <div class="action-buttons">
+                            <button onclick="descargarDatos()" class="btn-action">Descargar Registeo📥</button>
+                            <button onclick="cargarDatos()" class="btn-action">Cargar Registro📤</button>
+                        </div>
+                    </div>
+                    <button id="nuevoRegistro" class="btn-primary">Nuevo Registro</button>
+                </div>
+                <div class="table-container">
+                    <table id="confirmacionTable" class="table">
+                        <thead>
+                            <tr>
+                                <th class="text-center" data-column="libro">Libro</th>
+                                <th class="text-center" data-column="nombre_confirmante">Nombre</th>
+                                <th class="text-center" data-column="fecha_nacimiento">Fecha Nacimiento</th>
+                                <th class="text-center" data-column="folio">Folio</th>
+                                <th class="text-center" data-column="no_partida">No. Partida</th>
+                                <th class="text-center" data-column="nota">Nota</th>
+                                <th class="text-center">Acciones</th>
+                                <th class="text-center">Constancias</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                    <div class="pagination">
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <button class="btn btn-primary" id="btnAnterior">Anterior</button>
+                            <span id="paginaInfo">Página 1 de 1</span>
+                            <button class="btn btn-primary" id="btnSiguiente">Siguiente</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div id="confirmacionModal" class="modal">
+        <div class="modal-content">
+            <h2>Nuevo Registro de Confirmación</h2>
+            <form id="confirmacionForm">
+                <div class="form-group">
+                    <label for="fecha_confirmacion">Fecha de Confirmación:</label>
+                    <input type="date" id="fecha_confirmacion" name="fecha_confirmacion" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nombre_confirmante">Nombre del Confirmante:</label>
+                    <input type="text" id="nombre_confirmante" name="nombre_confirmante" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
+                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nombre_padre">Nombre del Padre:</label>
+                    <input type="text" id="nombre_padre" name="nombre_padre">
+                </div>
+
+                <div class="form-group">
+                    <label for="nombre_madre">Nombre de la Madre:</label>
+                    <input type="text" id="nombre_madre" name="nombre_madre">
+                </div>
+
+                <div class="form-group">
+                    <label for="padrino">Padrino:</label>
+                    <input type="text" id="padrino" name="padrino">
+                </div>
+
+                <div class="form-group">
+                    <label for="madrina">Madrina:</label>
+                    <input type="text" id="madrina" name="madrina">
+                </div>
+                <div class="form-group">
+                    <label for="libro">Libro:</label>
+                    <input type="text" id="libro" name="libro" required>
+                </div>
+                <div class="form-group">
+                    <label for="folio">Folio:</label>
+                    <input type="text" id="folio" name="folio" required>
+                </div>
+                <div class="form-group">
+                    <label for="no_partida">No. Partida:</label>
+                    <input type="text" id="no_partida" name="no_partida" required>
+                </div>
+                <div class="form-group">
+                    <label for="parroco">Párroco:</label>
+                    <input type="text" id="parroco" name="parroco" required>
+                </div>
+                <div class="form-group">
+                    <label for="nota">Nota:</label>
+                    <textarea id="nota" name="nota" rows="3"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Guardar</button>
+                    <button type="button" class="btn-secondary cancel">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+    <script src="js/confirmaciones.js"></script>
+</body>
+</html>

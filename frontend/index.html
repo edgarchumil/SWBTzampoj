@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Parroquial - Login</title>
+    <link rel="stylesheet" href="./css/login.css">
+    <link rel="icon" type="image/x-icon" href="./img/favicon.ico">
+</head>
+<body>
+    <div class="login-container">
+        <div class="carousel-side">
+            <div class="carousel">
+                <div class="carousel-slide active">
+                    <img src="./img/church1.jpg" alt="Iglesia 1">
+                </div>
+                <div class="carousel-slide">
+                    <img src="./img/church2.jpg" alt="Iglesia 2">
+                </div>
+                <div class="carousel-slide">
+                    <img src="./img/church3.jpg" alt="Iglesia 3">
+                </div>
+            </div>
+        </div>
+        <div class="form-side">
+            <div class="login-box">
+                <div class="logo-container">
+                    <img src="./img/logo.png" alt="Logo Parroquia">
+                    <h2>Parroquia Nuestra Señora de Lourdes</h2>
+                </div>
+                <form id="loginForm" class="login-form">
+                    <div id="error-message" class="error-message"></div>
+                    <input type="text" id="username" placeholder="Usuario" required>
+                    <input type="password" id="password" placeholder="Contraseña" required>
+                    <button type="submit">Ingresar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="./js/login.js"></script>
+    <script src="./js/carousel.js"></script>
+</body>
+</html>

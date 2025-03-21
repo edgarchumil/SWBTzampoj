@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrimonios - Sistema Parroquial</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/matrimonios.css">
+    <script src="js/auth.js"></script>
+    <!-- Replace the existing jsPDF script tags with these -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script>
+        window.jsPDF = window.jspdf.jsPDF;
+    </script>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar-toggle" id="sidebarToggle">
+            <span class="toggle-icon">☰</span>
+        </div>
+        <aside class="sidebar" id="sidebar">
+            <div class="logo-container">
+                <img src="img/logo.png" alt="Logo Parroquia">
+                <h2>Parroquia Nuestra Señora de Lourdes</h2>
+                <p class="parish-info">Aldea Tzampoj, Sololá<br>Tel: +502 3169-7846</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="./dashboard.html">Inicio</a></li>
+                <li><a href="./bautismos.html">Bautismos</a></li>
+                <li><a href="./comuniones.html">Comuniones</a></li>
+                <li><a href="./confirmaciones.html">Confirmaciones</a></li>
+                <li><a href="#" class="active">Matrimonios</a></li>
+            </ul>
+        </aside>
+
+        <div class="main-content">
+            <header class="header">
+                <h1></h1>
+                <div class="user-info">
+                    <img src="./img/user-avatar.png" alt="Usuario">
+                    <span id="username"></span>
+                    <button id="logout">Cerrar Sesión</button>
+                </div>
+            </header>
+
+            <div class="content">
+                <h1 style="color:#000035;" >Registro, Matrimonios</h1>
+                <div class="content-header">
+                    <div class="search-section">
+                        <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nombre de esposo o esposa...">
+                        <div class="button-group">
+                            <button id="exportExcel" class="btn btn-success">
+                                Descargar Registro 📥
+                            </button>
+                            <input type="file" id="importExcel" accept=".xlsx,.xls" style="display: none">
+                            <button onclick="document.getElementById('importExcel').click()" class="btn btn-primary">
+                                Cargar Registros 📤
+                            </button>
+                        </div>
+                    </div>
+                    <button id="nuevoRegistro" class="btn-primary">Nuevo Registro</button>
+                </div>
+                <div class="table-container">
+                    <table id="matrimoniosTable" class="table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Libro</th>
+                                <th class="text-center">Esposo</th>
+                                <th class="text-center">Esposa</th>
+                                <th class="text-center">Fecha Matrimonio</th>
+                                <th class="text-center">Folio</th>
+                                <th class="text-center">No. Partida</th>
+                                <th class="text-center">Nota</th>
+                                <th class="text-center">Acciones</th>
+                                <th class="text-center">Constancias</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                    <div class="pagination">
+                        <button id="btnAnterior">Anterior</button>
+                        <span id="paginaInfo">Página 1 de 1</span>
+                        <button id="btnSiguiente">Siguiente</button>
+                    </div>
+                    <!-- <div class="pagination">
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <button class="btn btn-primary" id="btnAnterior">Anterior</button>
+                            <span id="paginaInfo">Página 1 de 1</span>
+                            <button class="btn btn-primary" id="btnSiguiente">Siguiente</button>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <!-- Reemplazar los dos modales existentes con uno solo -->
+    <div id="matrimonioModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Nuevo, Registro de Matrimonio</h2>
+            <form id="matrimoniosForm">
+                <div class="form-group">
+                    <label for="fecha_matrimonio">Fecha de Matrimonio:</label>
+                    <input type="date" id="fecha_matrimonio" name="fecha_matrimonio" required>
+                </div>
+                <h3>Datos del Esposo</h3>
+                <div class="form-group">
+                    <label for="nombre_esposo">Nombre del Esposo</label>
+                    <input type="text" id="nombre_esposo" name="nombre_esposo" required>
+                </div>
+                <div class="form-group">
+                    <label for="fecha_nacimiento_esposo">Fecha de Nacimiento (esposo):</label>
+                    <input type="date" id="fecha_nacimiento_esposo" name="fecha_nacimiento_esposo" required>
+                </div>
+                <div class="form-group">
+                    <label for="nacimiento_esposo">Lugar de Nacimiento (esposo):</label>
+                    <input type="text" id="nacimiento_esposo" name="nacimiento_esposo">
+                </div>
+                <div class="form-group">
+                    <label for="nombre_padre_esposo">Nombre del Padre (esposo):</label>
+                    <input type="text" id="nombre_padre_esposo" name="nombre_padre_esposo">
+                </div>
+                <div class="form-group">
+                    <label for="nombre_madre_esposo">Nombre de la Madre (esposo):</label>
+                    <input type="text" id="nombre_madre_esposo" name="nombre_madre_esposo">
+                </div>
+                <h3>Datos de la Esposa</h3>
+                <div class="form-group">
+                    <label for="nombre_esposa">Nombre de la Esposa:</label>
+                    <input type="text" id="nombre_esposa" name="nombre_esposa" required>
+                </div>
+                <div class="form-group">
+                    <label for="fecha_nacimiento_esposa">Fecha de Nacimiento (esposa):</label>
+                    <input type="date" id="fecha_nacimiento_esposa" name="fecha_nacimiento_esposa" required>
+                </div>
+                <div class="form-group">
+                    <label for="nacimiento_esposa">Lugar de Nacimiento (esposa):</label>
+                    <input type="text" id="nacimiento_esposa" name="nacimiento_esposa">
+                </div>
+                <div class="form-group">
+                    <label for="nombre_padre_esposa">Nombre del Padre (esposa):</label>
+                    <input type="text" id="nombre_padre_esposa" name="nombre_padre_esposa">
+                </div>
+                <div class="form-group">
+                    <label for="nombre_madre_esposa">Nombre de la Madre (esposa):</label>
+                    <input type="text" id="nombre_madre_esposa" name="nombre_madre_esposa">
+                </div>
+                <h3>Datos Padrinos</h3>
+                <div class="form-group">
+                    <label for="padrino">Nombre Padrino:</label>
+                    <input type="text" id="padrino" name="padrino">
+                </div>
+
+                <div class="form-group">
+                    <label for="madrina">Nombre Madrina:</label>
+                    <input type="text" id="madrina" name="madrina">
+                </div>
+                <h3>Datos Registro</h3>
+                <div class="form-group">
+                    <label for="libro">Libro:</label>
+                    <input type="text" id="libro" name="libro" required>
+                </div>
+                <div class="form-group">
+                    <label for="folio">Folio:</label>
+                    <input type="text" id="folio" name="folio" required>
+                </div>
+                <div class="form-group">
+                    <label for="no_partida">No. Partida:</label>
+                    <input type="text" id="no_partida" name="no_partida" required>
+                </div>
+                <h3>Datos Sacerdote</h3>
+                <div class="form-group">
+                    <label for="parroco">Párroco:</label>
+                    <input type="text" id="parroco" name="parroco" required>
+                </div>
+                <h3>Nota</h3>
+                <div class="form-group">
+                    <label for="nota">Nota:</label>
+                    <textarea id="nota" name="nota" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Guardar</button>
+                    <button type="button" class="btn-secondary cancel">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+    <script src="js/matrimonios.js"></script>
+</body>
+</html>

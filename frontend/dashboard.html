@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - Sistema Parroquial</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar-toggle" id="sidebarToggle">
+            <span class="toggle-icon">☰</span>
+        </div>
+        <aside class="sidebar" id="sidebar">
+            <div class="logo-container">
+                <img src="img/logo.png" alt="Logo Parroquia">
+                <h2>Parroquia Nuestra Señora de Lourdes</h2>
+                <p class="parish-info">Aldea Tzampoj, Sololá<br>Tel: +502 3169-7846</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#" class="active">Inicio</a></li>
+                <li><a href="./bautismos.html">Bautismos</a></li>
+                <li><a href="./comuniones.html">Comuniones</a></li>
+                <li><a href="./confirmaciones.html">Confirmaciones</a></li>
+                <li><a href="./matrimonios.html">Matrimonios</a></li>
+            </ul>
+        </aside>
+
+        <div class="main-content">
+            <header class="header">
+                <h1 style="color: #000035";>Panel Principal</h1>
+                <div class="user-info" style="color: #000035";>
+                    <img src="./img/user-avatar.png" alt="Usuario">
+                    <span id="username" ></span>
+                    <button id="logout">Cerrar Sesión</button>
+                </div>
+            </header>
+
+            <div class="dashboard-cards">
+                <a class="card" href="./bautismos.html">
+                    <img src="./img/bautismo.jpg" alt="Bautismos">
+                    <h3 style="color:#000035;" >Bautismos</h3>
+                    <span class="counter" id="bautismosCounter">0 registros</span>
+                </a>
+                <a class="card" href="./comuniones.html">
+                    <img src="./img/comunion.jpg" alt="Primeras Comuniones">
+                    <h3 style="color:#000035;" >Comuniónes</h3>
+                    <span class="counter" id="primerasComunionesCounter">0 Registros</span>
+                </a>
+                <a class="card" href="./confirmaciones.html">
+                    <img src="./img/confirmacion.jpg" alt="Confirmaciones">
+                    <h3 style="color:#000035;" >Confirmaciones</h3>
+                    <span class="counter" id="confirmacionesCounter">0 Registros</span>
+                </a>
+                <a class="card" href="./matrimonios.html">
+                    <img src="./img/matrimonio.jpg" alt="Matrimonios">
+                    <h3 style="color:#000035;" >Matrimonios</h3>
+                    <span class="counter" id="matrimoniosCounter">0 Registros</span>
+                </a>
+            </div>
+            <div class="calendar-section">
+                <div class="calendar-grid">
+                    <div class="calendar-days" id="calendar-days"></div>
+                </div>
+                <div id="events-list"></div>
+            </div>
+        </div>
+    </div>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

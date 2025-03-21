@@ -1,0 +1,824 @@
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2980b9;
+    --background-color: #f5f6fa;
+    --text-color: #fff;
+    --sidebar-width: 250px;
+}
+
+/* Layout principal */
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Estilos del sidebar */
+
+
+/* Actualizar variables existentes */
+:root {
+    --sidebar-width: 250px;
+    --sidebar-collapsed-width: 70px;
+    --header-height: 60px;
+    --primary-color: #6540db;
+    --secondary-color: #6540db;
+    --background-color: #6540db;
+    --text-color: #fff;
+    --sidebar-bg: #6540db;
+    --card-bg: white;
+}
+
+[data-theme="dark"] {
+    --background-color: #1a1a1a;
+    --text-color: #fff;
+    --sidebar-bg: #2d2d2d;
+    --card-bg: #333;
+}
+
+/* Agregar el switch de tema */
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+}
+
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #6540db;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: #0f0862;
+    transition: .4s;
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--primary-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.theme-label {
+    margin-left: 10px;
+    color: var(--text-color);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: var(--background-color);
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar Styles */
+/* Actualizar variables existentes */
+:root {
+    --sidebar-width: 250px;
+    --sidebar-collapsed-width: 70px;
+    --header-height: 60px;
+    --primary-color: #3498db;
+    --secondary-color: #2980b9;
+    --background-color: #f5f6fa;
+    --text-color: #fff;
+    --sidebar-bg: #333;
+    --card-bg: white;
+}
+
+[data-theme="dark"] {
+    --background-color: #1a1a1a;
+    --text-color: #fff;
+    --sidebar-bg: #2d2d2d;
+    --card-bg: #333;
+}
+
+/* Agregar el switch de tema */
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+}
+
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.sidebar-toggle {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: #333;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    z-index: 1100;
+    border-radius: 4px;
+}
+
+.toggle-icon {
+    font-size: 24px;
+}
+
+.sidebar-toggle:hover {
+    background: #444;
+}
+
+.toggle-icon {
+    font-size: 20px;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--primary-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.theme-label {
+    margin-left: 10px;
+    color: var(--text-color);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: var(--background-color);
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: #192762;
+    color: white;
+    padding-top: var(--header-height);
+}
+
+.logo-container {
+    padding: 5px;
+    text-align: center;
+    border-bottom: 1px solid #444;
+}
+
+.logo-container img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    padding: 3px;
+    background-color: white;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+    object-fit: contain;
+}
+
+.logo-container h2 {
+    margin: 10px 0 5px 0;
+    font-size: 18px;
+    color: white;
+}
+
+.logo-container .parish-info {
+    color: #ccc;
+    font-size: 12px;
+    margin: 0;
+    padding: 0 10px;
+    line-height: 1.4;
+}
+
+.logo-container img:hover {
+    transform: scale(1.05);
+}
+
+.logo-container h2 {
+    margin: 15px 0;
+    font-size: 20px;
+    color: white;
+}
+
+.nav-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    color: #d69eff;
+}
+
+.nav-menu li {
+    padding: 0;
+}
+
+.nav-menu a {
+    display: block;
+    padding: 15px 20px;
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.nav-menu a:hover,
+.nav-menu a.active {
+    background-color: #314e8d;
+}
+
+/* Main Content Area */
+.main-content {
+    flex: 1;
+    padding: 20px;
+    padding-top: calc(var(--header-height) + 20px);
+}
+
+/* Header */
+.header {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: var(--sidebar-width);
+    height: var(--header-height);
+  
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    box-shadow: 0 2px 5px #fff;
+    z-index: 100;
+
+}
+
+/* Dashboard Cards */
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-icon {
+    font-size: 2em;
+    color: #d69eff;;
+    margin-bottom: 10px;
+}
+
+.card h3 {
+    margin: 10px 0;
+    color: d69eff;
+}
+
+.card span {
+    display: block;
+    margin-top: 10px;
+}
+
+.card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-icon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 10px;
+}
+
+.counter {
+    display: block;
+    margin-top: 10px;
+    color: #333;
+    font-size: 1em;
+    font-weight: 500;
+}
+
+.card h3 {
+    margin: 10px 0;
+    color: #fff;
+}
+
+.card span {
+    display: block;
+    margin-top: 10px;
+}
+
+.card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(165, 61, 61, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 150px;
+    margin: 0 auto;
+}
+
+.card img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    margin: 8px 0;
+}
+
+.card h3 {
+    padding: 8px;
+    margin: 0;
+    text-align: center;
+    color: #d69eff;
+    font-size: 0.9em;
+    width: 100%;
+    ;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.card h3 {
+    padding: 15px;
+    margin: 0;
+    text-align: center;
+    color: #d69eff;
+    font-size: 1.2em;
+}
+
+.calendar-container {
+    max-width: 600px;
+    margin: 20px auto;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.calendar-header button {
+    padding: 5px 12px;
+    font-size: 0.9em;
+}
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    border: 1px solid #ddd;
+    padding: 3px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    font-size: 0.85em;
+}
+
+.events-container {
+    margin-top: 15px;
+    padding: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.event-item {
+    padding: 8px;
+    margin-bottom: 3px;
+    font-size: 0.9em;
+}
+
+.calendar-day:hover {
+    background-color: #f0f0f0;
+}
+
+.calendar-day.today {
+    background-color: #e3f2fd;
+}
+
+.calendar-day.has-event {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.calendar-day.has-event::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+}
+
+.events-container {
+    margin-top: 20px;
+    padding: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.event-item {
+    padding: 10px;
+    margin-bottom: 5px;
+    background-color: #f8f9fa;
+    border-left: 3px solid var(--primary-color);
+    border-radius: 4px;
+}
+
+.card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.card h3 {
+    margin: 15px 0;
+    color: #333;
+}
+
+/* User Info */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-info img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+}
+
+#logout {
+    padding: 8px 15px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#logout:hover {
+    background-color: var(--secondary-color);
+}
+
+/* Eliminar estas clases si existen */
+.theme-switch-wrapper,
+.theme-switch,
+.slider,
+.theme-label {
+    display: none;
+}
+
+.dashboard-cards a.card {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.card .counter {
+    color: #666;
+    font-size: 0.9em;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+
+.sidebar.collapsed {
+    width: 45px;
+    overflow: hidden;
+    padding-top: 35px;
+}
+
+.sidebar-toggle {
+    width: 35px;
+    height: 35px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    right: 0;
+    border-radius: 0;
+}
+
+.toggle-icon {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.sidebar.collapsed .nav-menu {
+    margin-top: 0;
+}
+
+.sidebar.collapsed .nav-menu a {
+    padding: 12px 0;
+    text-align: center;
+    font-size: 14px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-toggle {
+    width: 35px;
+    height: 35px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggle-icon {
+    font-size: 16px;
+}
+
+/* Add these styles */
+.actividades-container {
+    margin: 20px;
+    padding: 15px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.actividades-container h3 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.lista-actividades {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.actividad-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 10px;
+}
+
+.actividad-fecha {
+    font-weight: bold;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.actividad-titulo {
+    font-weight: 500;
+    margin: 5px 0;
+    color: #d69eff;
+}
+
+.actividad-descripcion {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.upcoming-activities {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.calendar-container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.activities-container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.actividades-programadas {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.actividad-item {
+    background: white;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.actividad-titulo {
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.actividad-detalles {
+    display: flex;
+    gap: 15px;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.actividad-estado {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    margin-top: 8px;
+}
+
+.estado-programada { background-color: #e3f2fd; color: #1976d2; }
+.estado-en-curso { background-color: #fff3e0; color: #f57c00; }
+.estado-finalizada { background-color: #e8f5e9; color: #388e3c; }
+.estado-cancelada { background-color: #ffebee; color: #d32f2f; }
+
+/* Modal específico para actividades */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.form-actions button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.form-actions button[type="submit"] {
+    background: #4CAF50;
+    color: white;
+}
+
+.form-actions button[type="button"] {
+    background: #f44336;
+    color: white;
+}
