@@ -35,6 +35,7 @@ DEBUG = True
 #ALLOWED_HOSTS = ['swbtzampoj.onrender.com','127.0.0.1', 'localhost']
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
+ALLOWED_HOSTS += ['swbtzampoj.onrender.com']
 
 
 # Application definition
