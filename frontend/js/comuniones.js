@@ -719,6 +719,13 @@ function searchTable() {
     hideSearchSuggestions();
 }
 
+function hideSearchSuggestions() {
+    const suggestionsContainer = document.getElementById('searchSuggestions');
+    if (suggestionsContainer) {
+        suggestionsContainer.style.display = 'none';
+    }
+}
+
 function showSearchSuggestions(suggestions) {
     let suggestionsContainer = document.getElementById('searchSuggestions');
     
@@ -1223,6 +1230,13 @@ function searchTable() {
     hideSearchSuggestions();
 }
 
+function hideSearchSuggestions() {
+    const suggestionsContainer = document.getElementById('searchSuggestions');
+    if (suggestionsContainer) {
+        suggestionsContainer.style.display = 'none';
+    }
+}
+
 function showSearchSuggestions(suggestions) {
     let suggestionsContainer = document.getElementById('searchSuggestions');
     
@@ -1718,6 +1732,13 @@ function searchTable() {
     
     // Ocultar sugerencias después de realizar la búsqueda
     hideSearchSuggestions();
+}
+
+function hideSearchSuggestions() {
+    const suggestionsContainer = document.getElementById('searchSuggestions');
+    if (suggestionsContainer) {
+        suggestionsContainer.style.display = 'none';
+    }
 }
 
 function showSearchSuggestions(suggestions) {
