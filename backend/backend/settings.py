@@ -13,6 +13,12 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 
+import dj_database_url
+
+DATABASES = {
+    'default': dj_database_url.config(default=os.getenv('dpg-cvev6pdsvqrc73cr4r50-a'))
+}
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,7 +32,9 @@ SECRET_KEY = 'django-insecure-7#w0xv3#v_br*p7xb*x-p7lq07%uz9zv&9duz2&ivmx82t_575
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+#ALLOWED_HOSTS = ['swbtzampoj.onrender.com','127.0.0.1', 'localhost']
+
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
 
 
 # Application definition
