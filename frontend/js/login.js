@@ -2,6 +2,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('loginForm');
     const errorMessage = document.getElementById('error-message');
 
+    // Verificar si config está definido
+    if (typeof config === 'undefined') {
+        console.warn('La configuración centralizada no está disponible, usando valores por defecto');
+        var config = {
+            apiUrl: 'http://localhost:8080/api',
+            endpoints: {
+                auth: '/auth/login'
+            }
+        };
+    }
+
     // Verificar si ya hay una sesión activa
     const token = localStorage.getItem('token');
     if (token) {

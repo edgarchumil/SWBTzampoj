@@ -6,6 +6,10 @@ var config = {
         : 'http://localhost:8080/api',
     endpoints: {
         bautismos: '/bautismos',
+        bautismosCount: '/bautismo/count',
+        comuniones: '/comunion/total',
+        confirmaciones: '/confirmacion/total',
+        matrimonios: '/matrimonio/total',
         auth: '/auth/login'
     }
 };

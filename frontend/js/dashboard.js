@@ -78,16 +78,27 @@ function inicializarSidebar() {
 }
 
 
-// Actualizar la constante API_URL con las rutas correctas
-const API_URL = 'http://127.0.0.1:8080/api';
+// Usar la configuración centralizada de config.js
+// Verificar si config está definido, si no, definir una URL por defecto
+if (typeof config === 'undefined') {
+    console.warn('La configuración centralizada no está disponible, usando valores por defecto');
+    var config = {
+        apiUrl: 'http://localhost:8080/api',
+        endpoints: {
+            bautismosCount: '/bautismo/count',
+            comuniones: '/comunion/total',
+            confirmaciones: '/confirmacion/total',
+            matrimonios: '/matrimonio/total'
+        }
+    };
+}
 
-// Rutas de la API
-// Actualizar las rutas para que coincidan con el backend
+// Rutas de la API usando la configuración centralizada
 const API_ROUTES = {
-    bautismos: `${API_URL}/bautismo/count`,
-    comuniones: `${API_URL}/comunion/total`,
-    confirmaciones: `${API_URL}/confirmacion/total`, // Cambiado a plural
-    matrimonios: `${API_URL}/matrimonio/total`       // Corregido de matrimonion a matrimonios
+    bautismos: `${config.apiUrl}${config.endpoints.bautismosCount}`,
+    comuniones: `${config.apiUrl}${config.endpoints.comuniones}`,
+    confirmaciones: `${config.apiUrl}${config.endpoints.confirmaciones}`,
+    matrimonios: `${config.apiUrl}${config.endpoints.matrimonios}`
 };
 
 async function actualizarContadorBautismos() {
