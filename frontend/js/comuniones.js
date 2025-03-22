@@ -28,14 +28,14 @@ function formatearFecha(fecha) {
 }
 
 function filtrarRegistros(searchTerm) {
-    const tbody = document.querySelector('#confirmacionTable tbody');
+    const tbody = document.querySelector('#comunionTable tbody');
     const rows = tbody.getElementsByTagName('tr');
 
     for (let row of rows) {
         const nombreCell = row.cells[1]; // Column with names
         if (nombreCell) {
             const nombre = nombreCell.textContent || nombreCell.innerText;
-            const matchesSearch = nombre.toLowerCase().includes(searchTerm);
+            const matchesSearch = nombre.toLowerCase().includes(searchTerm.toLowerCase());
             row.style.display = matchesSearch ? '' : 'none';
         }
     }
@@ -577,7 +577,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Agregar el event listener directamente aquí y asegurarse de que funcione
         searchInput.addEventListener('input', function() {
             console.log('Evento de búsqueda activado');
-            debounce(searchTable, 300)();
+            const searchTerm = this.value.trim().toLowerCase();
+            filtrarRegistros(searchTerm);
         });
     }
 
@@ -1089,7 +1090,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Agregar el event listener directamente aquí y asegurarse de que funcione
         searchInput.addEventListener('input', function() {
             console.log('Evento de búsqueda activado');
-            debounce(searchTable, 300)();
+            const searchTerm = this.value.trim().toLowerCase();
+            filtrarRegistros(searchTerm);
         });
     }
 
@@ -1592,7 +1594,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Agregar el event listener directamente aquí y asegurarse de que funcione
         searchInput.addEventListener('input', function() {
             console.log('Evento de búsqueda activado');
-            debounce(searchTable, 300)();
+            const searchTerm = this.value.trim().toLowerCase();
+            filtrarRegistros(searchTerm);
         });
     }
 
