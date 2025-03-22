@@ -8,8 +8,8 @@ var config = {
         bautismos: '/bautismos/',
         bautismosCount: '/bautismo/count/',
         comuniones: '/comunion/total/',
-        confirmaciones: '/confirmacion/total/',
-        matrimonios: '/matrimonio/total/',
+        confirmaciones: '/confirmacion/total',
+        matrimonios: '/matrimonio/total',
         auth: '/auth/login/'
     }
 };
