@@ -1,0 +1,13 @@
+{
+  "name": "sistemawebparroquia-frontend",
+  "version": "1.0.0",
+  "description": "Frontend para el Sistema Web de la Parroquia Nuestra Señora de Lourdes",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "path": "^0.12.7"
+  }
+}

@@ -15,12 +15,6 @@ from datetime import timedelta
 import os
 import dj_database_url
 
-#import dj_database_url
-
-DATABASES = {
-    'default': dj_database_url.config(default=os.getenv('dpg-cvev6pdsvqrc73cr4r50-a'))
-}
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -34,10 +28,12 @@ SECRET_KEY = 'django-insecure-7#w0xv3#v_br*p7xb*x-p7lq07%uz9zv&9duz2&ivmx82t_575
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-#ALLOWED_HOSTS = ['swbtzampoj.onrender.com','127.0.0.1', 'localhost']
+# Configuración de hosts permitidos
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-ALLOWED_HOSTS = ( 'localhost', '127.0.0.1')
-#ALLOWED_HOSTS += ['swbtzampoj.onrender.com']
+# Si estamos en producción, usar la variable de entorno ALLOWED_HOSTS
+if os.environ.get('ALLOWED_HOSTS'):
+    ALLOWED_HOSTS.extend(os.environ.get('ALLOWED_HOSTS').split(','))
 
 
 # Application definition
@@ -80,6 +76,13 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5500",
     "http://localhost:5500"
 ]
+
+# Agregar dominios de Render.com para CORS en producción
+if os.environ.get('RENDER'):
+    CORS_ALLOWED_ORIGINS.extend([
+        "https://sistemawebparroquia-frontend.onrender.com",
+        "https://sistemawebparroquia-backend.onrender.com"
+    ])
 
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -126,12 +129,20 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Configuración de base de datos para desarrollo y producción
+if os.environ.get('DATABASE_URL'):
+    # Configuración para producción (Render.com)
+    DATABASES = {
+        'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
     }
-}
+else:
+    # Configuración para desarrollo local
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation

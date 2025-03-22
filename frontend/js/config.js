@@ -1,5 +1,8 @@
 const config = {
-    apiUrl: 'http://127.0.0.1:8080/api',
+    // Determinar si estamos en producción o desarrollo
+    apiUrl: window.location.hostname.includes('render.com') 
+        ? 'https://sistemawebparroquia-backend.onrender.com/api'
+        : 'http://127.0.0.1:8080/api',
     endpoints: {
         bautismos: '/bautismos',
         auth: '/auth/login'
