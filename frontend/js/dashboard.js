@@ -103,7 +103,7 @@ const API_ROUTES = {
 
 async function actualizarContadorBautismos() {
     try {
-        console.log('🌐 Verificando ruta de bautismos:', API_ROUTES.bautismos);
+        //console.log('🌐 Verificando ruta de bautismos:', API_ROUTES.bautismos);
         const response = await fetch(API_ROUTES.bautismos, {
             method: 'GET',
             headers: {
@@ -120,12 +120,12 @@ async function actualizarContadorBautismos() {
         }
         
         const data = await response.json();
-        console.log('Datos de bautismos recibidos:', data);
+        //console.log('Datos de bautismos recibidos:', data);
         
         const counterElement = document.getElementById('bautismosCounter');
         if (counterElement) {
             counterElement.textContent = `${data.total || 0} registros`;
-            console.log('Contador de bautismos actualizado:', counterElement.textContent);
+            //console.log('Contador de bautismos actualizado:', counterElement.textContent);
         }
     } catch (error) {
         console.error('Error al actualizar contador de bautismos:', error);
@@ -136,7 +136,7 @@ async function actualizarContadorBautismos() {
 
 async function actualizarContadorPrimerasComuniones() {
     try {
-        console.log('🌐 Verificando ruta de comuniones:', API_ROUTES.comuniones);
+        //console.log('🌐 Verificando ruta de comuniones:', API_ROUTES.comuniones);
         const response = await fetch(API_ROUTES.comuniones, {
             method: 'GET',
             headers: {
@@ -146,7 +146,7 @@ async function actualizarContadorPrimerasComuniones() {
             }
         });
         
-        console.log('Estado respuesta comuniones:', response.status);
+        //console.log('Estado respuesta comuniones:', response.status);
         
         if (!response.ok) {
             const errorText = await response.text();
@@ -157,7 +157,7 @@ async function actualizarContadorPrimerasComuniones() {
         }
         
         const data = await response.json();
-        console.log('Datos de comuniones recibidos:', data);
+        //console.log('Datos de comuniones recibidos:', data);
         
         const counterElement = document.getElementById('primerasComunionesCounter');
         if (counterElement) {
@@ -172,7 +172,7 @@ async function actualizarContadorPrimerasComuniones() {
 
 async function actualizarContadorConfirmaciones() {
     try {
-        console.log('Intentando obtener contador de confirmaciones...');
+        //console.log('Intentando obtener contador de confirmaciones...');
         const response = await fetch(API_ROUTES.confirmaciones, { // Usar la ruta desde API_ROUTES
             method: 'GET',
             headers: {
@@ -202,7 +202,7 @@ async function actualizarContadorConfirmaciones() {
 
 async function actualizarContadorMatrimonios() {
     try {
-        console.log('Intentando obtener contador de matrimonios...');
+        //console.log('Intentando obtener contador de matrimonios...');
         const response = await fetch(API_ROUTES.matrimonios, { // Usar la ruta desde API_ROUTES
             method: 'GET',
             headers: {

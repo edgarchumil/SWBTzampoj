@@ -776,7 +776,7 @@ async function cargarDatos() {
 
 // Inicializar la página cuando el DOM esté cargado
 document.addEventListener('DOMContentLoaded', async function() {
-    console.log('DOM cargado, inicializando página de confirmaciones');
+    //console.log('DOM cargado, inicializando página de confirmaciones');
     
     // Mostrar indicador de carga
     mostrarCargando('Cargando datos de confirmaciones...');
@@ -792,7 +792,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Configurar el buscador
     const searchInput = document.querySelector('input[type="text"], input[placeholder*="Buscar"]');
     if (searchInput) {
-        console.log('Buscador encontrado, configurando evento de búsqueda');
+        //console.log('Buscador encontrado, configurando evento de búsqueda');
         searchInput.addEventListener('input', handleSearch);
     } else {
         console.error('No se encontró el campo de búsqueda');
@@ -801,7 +801,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Configurar el botón de nuevo registro
     const btnNuevoRegistro = document.getElementById('nuevoRegistro');
     if (btnNuevoRegistro) {
-        console.log('Botón Nuevo Registro encontrado, configurando evento');
+        //console.log('Botón Nuevo Registro encontrado, configurando evento');
         btnNuevoRegistro.addEventListener('click', abrirModal);
     } else {
         console.error('No se encontró el botón de Nuevo Registro');
@@ -945,7 +945,7 @@ function ocultarCargando() {
 // Función para cargar confirmaciones
 async function loadConfirmaciones() {
     try {
-        console.log('Cargando confirmaciones...');
+        //console.log('Cargando confirmaciones...');
         mostrarCargando('Cargando registros de confirmaciones...');
         
         const response = await fetch(`${API_URL}/confirmaciones/`, {
@@ -961,13 +961,13 @@ async function loadConfirmaciones() {
         }
 
         const data = await response.json();
-        console.log('Datos recibidos:', data);
+        //console.log('Datos recibidos:', data);
         
         let confirmacionesArray = [];
         
         // Verificar si los datos tienen el formato esperado (paginado)
         if (data && data.results && Array.isArray(data.results)) {
-            console.log('Usando datos paginados, encontrados:', data.results.length, 'registros');
+            //console.log('Usando datos paginados, encontrados:', data.results.length, 'registros');
             confirmacionesArray = data.results;
         } else if (Array.isArray(data)) {
             console.log('Usando datos como array, encontrados:', data.length, 'registros');
