@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             console.log('Intentando login con:', { email, password });
-            const response = await fetch(config.apiUrl + '/auth/login/', {
+            const response = await fetch(config.apiUrl + '/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
