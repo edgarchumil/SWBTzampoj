@@ -82,11 +82,11 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # Agregar dominios de Render.com para CORS en producción
-if os.environ.get('RENDER'):
-    CORS_ALLOWED_ORIGINS.extend([
-        "https://sistemawebparroquia-frontend.onrender.com",
-        "https://sistemawebparroquia-backend.onrender.com"
-    ])
+# Siempre incluir los dominios de Render.com para evitar problemas CORS
+CORS_ALLOWED_ORIGINS.extend([
+    "https://sistemawebparroquia-frontend.onrender.com",
+    "https://sistemawebparroquia-backend.onrender.com"
+])
 
 CORS_ALLOW_METHODS = [
     'DELETE',

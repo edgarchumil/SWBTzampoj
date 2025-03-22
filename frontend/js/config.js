@@ -1,7 +1,7 @@
 // Definir config como variable global para que sea accesible desde otros archivos
 var config = {
     // Determinar si estamos en producción o desarrollo
-    apiUrl: window.location.hostname.includes('render.com') 
+    apiUrl: window.location.hostname.includes('render.com') || window.location.hostname === 'sistemawebparroquia-frontend.onrender.com'
         ? 'https://sistemawebparroquia-backend.onrender.com/api'
         : 'http://localhost:8080/api',
     endpoints: {
