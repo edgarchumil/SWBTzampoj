@@ -4,6 +4,9 @@ if (typeof API_URL === 'undefined') {
     API_URL = 'http://localhost:8080/api';
 }
 
+// Definir API_URL como variable global
+var API_URL = config.apiUrl;
+
 // Función para formatear fechas en formato español
 function formatearFecha(fecha) {
     if (!fecha) return '';
