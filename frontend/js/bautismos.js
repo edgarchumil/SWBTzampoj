@@ -1,7 +1,16 @@
-// Instead of:
-if (typeof API_URL === 'undefined') {
-    const API_URL = 'http://localhost:8080/api';
+// Usar la configuración centralizada de config.js
+if (typeof config === 'undefined') {
+    console.warn('La configuración centralizada no está disponible, usando valores por defecto');
+    var config = {
+        apiUrl: 'http://localhost:8080/api',
+        endpoints: {
+            bautismos: '/bautismos'
+        }
+    };
 }
+
+// Definir API_URL como variable global
+var API_URL = config.apiUrl;
 
 const ITEMS_PER_PAGE = 15;
 let currentPage = 1;
