@@ -33,7 +33,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             console.log('Intentando login con:', { email, password });
-            const response = await fetch(config.apiUrl + '/auth/login', {
+            // Usar la función getApiUrl que asegura que la URL termine con barra diagonal
+            const authUrl = getApiUrl('auth');
+            console.log('URL de autenticación:', authUrl);
+            const response = await fetch(authUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
