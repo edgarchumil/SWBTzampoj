@@ -2,6 +2,9 @@ if (typeof API_URL === 'undefined') {
     const API_URL = 'http://localhost:8080/api';
 }
 
+// Definir API_URL como variable global
+var API_URL = config.apiUrl;
+
 document.addEventListener('DOMContentLoaded', () => {
     cargarConfirmaciones();
 
