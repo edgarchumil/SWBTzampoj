@@ -12,8 +12,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
-
+import os
 import dj_database_url
+
+#import dj_database_url
 
 DATABASES = {
     'default': dj_database_url.config(default=os.getenv('dpg-cvev6pdsvqrc73cr4r50-a'))
@@ -34,8 +36,8 @@ DEBUG = True
 
 #ALLOWED_HOSTS = ['swbtzampoj.onrender.com','127.0.0.1', 'localhost']
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
-ALLOWED_HOSTS += ['swbtzampoj.onrender.com']
+ALLOWED_HOSTS = ( 'localhost', '127.0.0.1')
+#ALLOWED_HOSTS += ['swbtzampoj.onrender.com']
 
 
 # Application definition

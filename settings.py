@@ -1,6 +1,5 @@
 # ...existing code...
-ALLOWED_HOSTS = [
-    # ...existing hosts...
-    'swbtzampoj.onrender.com',
-]
+import os
+
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
 # ...existing code...
