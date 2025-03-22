@@ -154,7 +154,7 @@ function setupTableSorting() {
 
 // Inicializar la página cuando el DOM esté cargado
 document.addEventListener('DOMContentLoaded', async function() {
-    console.log('DOM cargado, inicializando página de matrimonios');
+    //console.log('DOM cargado, inicializando página de matrimonios');
     
     // Mostrar indicador de carga
     mostrarCargando('Cargando datos de matrimonios...');
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Configurar el buscador - asegurarse de que el ID sea correcto
     const searchInput = document.querySelector('input[type="text"], input[placeholder*="Buscar"]');
     if (searchInput) {
-        console.log('Buscador encontrado, configurando evento de búsqueda');
+        //console.log('Buscador encontrado, configurando evento de búsqueda');
         searchInput.addEventListener('input', handleSearch);
     } else {
         console.error('No se encontró el campo de búsqueda');
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Configurar el botón de nuevo registro
     const btnNuevoRegistro = document.getElementById('nuevoRegistro');
     if (btnNuevoRegistro) {
-        console.log('Botón Nuevo Registro encontrado, configurando evento');
+        //console.log('Botón Nuevo Registro encontrado, configurando evento');
         btnNuevoRegistro.addEventListener('click', abrirModal);
     } else {
         console.error('No se encontró el botón de Nuevo Registro');
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Configurar el botón de descargar registros - CORREGIDO
     const btnDescargarRegistro = document.getElementById('exportExcel');
     if (btnDescargarRegistro) {
-        console.log('Botón Descargar Registro encontrado, configurando evento');
+        //console.log('Botón Descargar Registro encontrado, configurando evento');
         btnDescargarRegistro.addEventListener('click', descargarRegistrosExcel);
     } else {
         // Buscar por texto alternativo
@@ -377,7 +377,7 @@ function ocultarCargando() {
 // ÚNICA FUNCIÓN PARA CARGAR MATRIMONIOS
 async function loadMatrimonios() {
     try {
-        console.log('Cargando matrimonios...');
+        //console.log('Cargando matrimonios...');
         mostrarCargando('Cargando registros de matrimonios...');
 
         
@@ -396,7 +396,7 @@ async function loadMatrimonios() {
         }
 
         const data = await response.json();
-        console.log('Datos recibidos:', data);
+        //console.log('Datos recibidos:', data);
         
         let matrimoniosData = {
             items: [],
@@ -407,7 +407,7 @@ async function loadMatrimonios() {
         // Verificar si los datos tienen el formato esperado (paginado)
         if (data && data.results && Array.isArray(data.results)) {
             // Usar data.results que contiene el array de matrimonios
-            console.log('Usando datos paginados, encontrados:', data.results.length, 'registros');
+            //console.log('Usando datos paginados, encontrados:', data.results.length, 'registros');
             matrimoniosData.items = data.results;
             matrimoniosData.total = data.count || data.results.length;
         } else if (Array.isArray(data)) {
@@ -424,7 +424,7 @@ async function loadMatrimonios() {
 
         //Aplicar ordenamiento múltiple ANTES de filtrar y paginar
         matrimoniosData.items = ordenarMultiple(matrimoniosData.items);
-        console.log('Datos ordenados por libro, folio y no_partida');
+        //console.log('Datos ordenados por libro, folio y no_partida');
         
         // Filtrar los datos según el término de búsqueda
         if (searchTerm) {
@@ -460,7 +460,7 @@ async function loadMatrimonios() {
         const endIndex = Math.min(startIndex + itemsPerPage, matrimoniosData.items.length);
         const paginatedItems = matrimoniosData.items.slice(startIndex, endIndex);
 
-        console.log(`Mostrando página ${currentPage} de ${totalPages} (${paginatedItems.length} registros de ${matrimoniosData.items.length})`);
+        //console.log(`Mostrando página ${currentPage} de ${totalPages} (${paginatedItems.length} registros de ${matrimoniosData.items.length})`);
         // Mostrar los datos paginados
         displayMatrimonios(paginatedItems);
         
@@ -492,7 +492,7 @@ async function loadMatrimonios() {
 }
 
 function configurarPaginacion() {
-    console.log('Configurando paginación inicial...');
+    //console.log('Configurando paginación inicial...');
     
     // Buscar el contenedor de paginación o crearlo si no existe
     let paginationContainer = document.querySelector('.pagination-container');
@@ -626,7 +626,7 @@ function configurarPaginacion() {
         });
     }
     
-    console.log('Paginación inicial configurada correctamente');
+    //console.log('Paginación inicial configurada correctamente');
 }
 
 // Función para mostrar los matrimonios en la tabla
@@ -639,7 +639,7 @@ function displayMatrimonios(matrimonios) {
         return;
     }
     
-    console.log('Elemento tbody encontrado, mostrando', matrimonios.length, 'registros');
+    //console.log('Elemento tbody encontrado, mostrando', matrimonios.length, 'registros');
     
     // Limpiar la tabla antes de agregar nuevos datos
     tableBody.innerHTML = '';
@@ -655,7 +655,7 @@ function displayMatrimonios(matrimonios) {
     matrimonios.forEach((matrimonio, index) => {
         if (!matrimonio) return; // Saltar elementos nulos o indefinidos
         
-        console.log(`Procesando matrimonio ${index+1}/${matrimonios.length}:`, matrimonio);
+        //console.log(`Procesando matrimonio ${index+1}/${matrimonios.length}:`, matrimonio);
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${matrimonio.libro || ''}</td>
@@ -676,7 +676,7 @@ function displayMatrimonios(matrimonios) {
         tableBody.appendChild(row);
     });
         
-    console.log(`Total de filas agregadas a la tabla: ${tableBody.children.length}`);
+    //console.log(`Total de filas agregadas a la tabla: ${tableBody.children.length}`);
 }
 
 // Función para editar un matrimonio
@@ -1338,7 +1338,7 @@ async function cargarRegistrosExcel(event) {
 }
 
 function updatePaginationInfo(currentPage, totalPages, totalItems) {
-    console.log('Actualizando información de paginación...');
+    //console.log('Actualizando información de paginación...');
     
     // Actualizar texto de paginación
     const paginationInfo = document.querySelector('.pagination-info');
@@ -1370,7 +1370,7 @@ function updatePaginationInfo(currentPage, totalPages, totalItems) {
         btnSiguiente.style.cursor = currentPage >= totalPages ? 'not-allowed' : 'pointer';
     }
     
-    console.log(`Información de paginación actualizada: Página ${currentPage} de ${totalPages}, Total: ${totalItems} registros`);
+    //console.log(`Información de paginación actualizada: Página ${currentPage} de ${totalPages}, Total: ${totalItems} registros`);
 }
 
 function updateSortIndicators() {
@@ -1405,7 +1405,7 @@ function updateSortIndicators() {
 }
 
 function ordenarMultiple(matrimonios) {
-    console.log('Aplicando ordenamiento múltiple: libro, folio, no_partida');
+    //console.log('Aplicando ordenamiento múltiple: libro, folio, no_partida');
     
     return [...matrimonios].sort((a, b) => {
         // Primero ordenar por libro
