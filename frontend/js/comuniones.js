@@ -563,7 +563,29 @@ async function loadComuniones(searchTerm = '') {
     }
 }
 
+// Ejecutar solo una vez cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
+    // Verificar si ya se ha inicializado para evitar múltiples inicializaciones
+    if (document.querySelector('#comunionForm[data-initialized="true"]')) {
+        console.log('El formulario ya ha sido inicializado');
+        return;
+    }
+    
+    // Marcar el formulario como inicializado
+    const form = document.getElementById('comunionForm');
+    form.setAttribute('data-initialized', 'true');
+    
+    // Eliminar todos los event listeners existentes clonando el nodo
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+    
+    // Obtener la referencia actualizada al formulario
+    const comunionForm = document.getElementById('comunionForm');
+    comunionForm.setAttribute('data-initialized', 'true');
+    
+    // Agregar un único event listener al formulario
+    comunionForm.addEventListener('submit', async function(e) {
+    
     // Search input configuration
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
@@ -612,7 +634,13 @@ document.addEventListener('DOMContentLoaded', function() {
     loadComuniones();  // Add this line to load data when page loads
 
     // Form submit handler - ONLY ONE EVENT LISTENER TO PREVENT DUPLICATES
-    document.getElementById('comunionForm').addEventListener('submit', async function(e) {
+    // Este código ya no se ejecutará porque hemos reemplazado el formulario y agregado un único listener arriba
+    // const form = document.getElementById('comunionForm');
+    // Remover cualquier event listener existente (no funciona directamente, pero es una buena práctica)
+    // form.replaceWith(form.cloneNode(true));
+    // Obtener la referencia actualizada después de clonar
+    // const newForm = document.getElementById('comunionForm');
+    // newForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const formData = {
@@ -1074,7 +1102,29 @@ async function uploadRegistros(file) {
     }
 }
 
+// Ejecutar solo una vez cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
+    // Verificar si ya se ha inicializado para evitar múltiples inicializaciones
+    if (document.querySelector('#comunionForm[data-initialized="true"]')) {
+        console.log('El formulario ya ha sido inicializado');
+        return;
+    }
+    
+    // Marcar el formulario como inicializado
+    const form = document.getElementById('comunionForm');
+    form.setAttribute('data-initialized', 'true');
+    
+    // Eliminar todos los event listeners existentes clonando el nodo
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+    
+    // Obtener la referencia actualizada al formulario
+    const comunionForm = document.getElementById('comunionForm');
+    comunionForm.setAttribute('data-initialized', 'true');
+    
+    // Agregar un único event listener al formulario
+    comunionForm.addEventListener('submit', async function(e) {
+    
     // Search input configuration
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
@@ -1123,7 +1173,13 @@ document.addEventListener('DOMContentLoaded', function() {
     loadComuniones();  // Add this line to load data when page loads
 
     // Form submit handler - ONLY ONE EVENT LISTENER TO PREVENT DUPLICATES
-    document.getElementById('comunionForm').addEventListener('submit', async function(e) {
+    // Este código ya no se ejecutará porque hemos reemplazado el formulario y agregado un único listener arriba
+    // const form = document.getElementById('comunionForm');
+    // Remover cualquier event listener existente (no funciona directamente, pero es una buena práctica)
+    // form.replaceWith(form.cloneNode(true));
+    // Obtener la referencia actualizada después de clonar
+    // const newForm = document.getElementById('comunionForm');
+    // newForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const formData = {
@@ -1494,7 +1550,29 @@ async function uploadRegistros(file) {
     }
 }
 
+// Ejecutar solo una vez cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
+    // Verificar si ya se ha inicializado para evitar múltiples inicializaciones
+    if (document.querySelector('#comunionForm[data-initialized="true"]')) {
+        console.log('El formulario ya ha sido inicializado');
+        return;
+    }
+    
+    // Marcar el formulario como inicializado
+    const form = document.getElementById('comunionForm');
+    form.setAttribute('data-initialized', 'true');
+    
+    // Eliminar todos los event listeners existentes clonando el nodo
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+    
+    // Obtener la referencia actualizada al formulario
+    const comunionForm = document.getElementById('comunionForm');
+    comunionForm.setAttribute('data-initialized', 'true');
+    
+    // Agregar un único event listener al formulario
+    comunionForm.addEventListener('submit', async function(e) {
+    
     // Search input configuration
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
@@ -1543,7 +1621,13 @@ document.addEventListener('DOMContentLoaded', function() {
     loadComuniones();  // Add this line to load data when page loads
 
     // Form submit handler - ONLY ONE EVENT LISTENER TO PREVENT DUPLICATES
-    document.getElementById('comunionForm').addEventListener('submit', async function(e) {
+    // Este código ya no se ejecutará porque hemos reemplazado el formulario y agregado un único listener arriba
+    // const form = document.getElementById('comunionForm');
+    // Remover cualquier event listener existente (no funciona directamente, pero es una buena práctica)
+    // form.replaceWith(form.cloneNode(true));
+    // Obtener la referencia actualizada después de clonar
+    // const newForm = document.getElementById('comunionForm');
+    // newForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const formData = {
