@@ -1,4 +1,5 @@
-const config = {
+// Definir config como variable global para que sea accesible desde otros archivos
+var config = {
     // Determinar si estamos en producción o desarrollo
     apiUrl: window.location.hostname.includes('render.com') 
         ? 'https://sistemawebparroquia-backend.onrender.com/api'
