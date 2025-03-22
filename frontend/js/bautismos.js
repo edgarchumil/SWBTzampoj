@@ -123,7 +123,7 @@ async function loadBautismosTable() {
 
     try {
         mostrarCargando('Cargando registros de bautismos...');
-        console.log('Iniciando carga de datos de bautismos...');
+        //console.log('Iniciando carga de datos de bautismos...');
         const token = localStorage.getItem('token');
         
         if (!token) {
@@ -131,7 +131,7 @@ async function loadBautismosTable() {
             throw new Error('Token de autenticación no encontrado');
         }
 
-        console.log('Realizando petición al servidor...');
+        //console.log('Realizando petición al servidor...');
         const response = await fetch(`${API_URL}/bautismos`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -290,7 +290,7 @@ async function guardarBautismo(event) {
         const formData = new FormData(event.target);
         const editId = event.target.dataset.editId;
         
-        console.log(editId ? 'Actualizando registro existente...' : 'Creando nuevo registro...');
+        //console.log(editId ? 'Actualizando registro existente...' : 'Creando nuevo registro...');
         
         const bautismoData = {
             fechaBautismo: formData.get('fechaBautismo'),
@@ -312,8 +312,8 @@ async function guardarBautismo(event) {
         const method = editId ? 'PUT' : 'POST';
         const url = editId ? `${API_URL}/bautismos/${editId}/` : `${API_URL}/bautismos/`;
 
-        console.log(`Enviando petición ${method} a ${url}`);
-        console.log('Datos a enviar:', bautismoData);
+        //console.log(`Enviando petición ${method} a ${url}`);
+        //console.log('Datos a enviar:', bautismoData);
 
         const response = await fetch(url, {
             method: method,

@@ -352,7 +352,7 @@ async function loadComuniones(searchTerm = '') {
             return partidaA - partidaB;
         });
 
-        console.log('Total records fetched:', allResults.length);
+        //console.log('Total records fetched:', allResults.length);
         allData = sortedData; // Guardar los datos en la variable global
         
         // Si hay un término de búsqueda, filtrar los datos
@@ -579,7 +579,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Agregar el event listener directamente aquí y asegurarse de que funcione
         searchInput.addEventListener('input', function() {
-            console.log('Evento de búsqueda activado');
+            //console.log('Evento de búsqueda activado');
             const searchTerm = this.value.trim().toLowerCase();
             filtrarRegistros(searchTerm);
         });
@@ -603,8 +603,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Event listeners
-    // Eliminar esta línea que usa el operador opcional
-    // searchInput?.addEventListener('input', debounce(searchTable, 300));
     nuevoRegistroBtn.addEventListener('click', showModal);
     cancelBtn.addEventListener('click', hideModal);
     window.addEventListener('click', (event) => event.target === modal && hideModal());
@@ -613,7 +611,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add initial data load
     loadComuniones();  // Add this line to load data when page loads
 
-    // Inside DOMContentLoaded event listener, update the form submit handler
+    // Form submit handler - ONLY ONE EVENT LISTENER TO PREVENT DUPLICATES
     document.getElementById('comunionForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
@@ -1092,7 +1090,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Agregar el event listener directamente aquí y asegurarse de que funcione
         searchInput.addEventListener('input', function() {
-            console.log('Evento de búsqueda activado');
+            //console.log('Evento de búsqueda activado');
             const searchTerm = this.value.trim().toLowerCase();
             filtrarRegistros(searchTerm);
         });
@@ -1116,7 +1114,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Event listeners
-    // Eliminamos este event listener ya que ya tenemos uno arriba que usa searchTable()
     nuevoRegistroBtn.addEventListener('click', showModal);
     cancelBtn.addEventListener('click', hideModal);
     window.addEventListener('click', (event) => event.target === modal && hideModal());
@@ -1125,7 +1122,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add initial data load
     loadComuniones();  // Add this line to load data when page loads
 
-    // Inside DOMContentLoaded event listener, update the form submit handler
+    // Form submit handler - ONLY ONE EVENT LISTENER TO PREVENT DUPLICATES
     document.getElementById('comunionForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
@@ -1596,7 +1593,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Agregar el event listener directamente aquí y asegurarse de que funcione
         searchInput.addEventListener('input', function() {
-            console.log('Evento de búsqueda activado');
+            //console.log('Evento de búsqueda activado');
             const searchTerm = this.value.trim().toLowerCase();
             filtrarRegistros(searchTerm);
         });
@@ -1620,8 +1617,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Event listeners
-    // Eliminar esta línea que usa el operador opcional
-    // searchInput?.addEventListener('input', debounce(searchTable, 300));
     nuevoRegistroBtn.addEventListener('click', showModal);
     cancelBtn.addEventListener('click', hideModal);
     window.addEventListener('click', (event) => event.target === modal && hideModal());
@@ -1630,7 +1625,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add initial data load
     loadComuniones();  // Add this line to load data when page loads
 
-    // Inside DOMContentLoaded event listener, update the form submit handler
+    // Form submit handler - ONLY ONE EVENT LISTENER TO PREVENT DUPLICATES
     document.getElementById('comunionForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
