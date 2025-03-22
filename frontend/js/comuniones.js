@@ -1,10 +1,4 @@
-// Definir URL base de la API
-// Definir URL base de la API
-if (typeof API_URL === 'undefined') {
-    API_URL = 'http://localhost:8080/api';
-}
-
-// Definir API_URL como variable global
+// Definir URL base de la API usando la configuración centralizada
 var API_URL = config.apiUrl;
 
 // Función para formatear fechas en formato español
@@ -492,6 +486,8 @@ async function loadComuniones(searchTerm = '') {
             ? `${API_URL}/comuniones/?search=${encodeURIComponent(searchTerm)}`
             : `${API_URL}/comuniones/`;
 
+        console.log('Cargando datos desde:', initialUrl);
+        
         const initialResponse = await fetch(initialUrl, {
             method: 'GET',
             headers: {
