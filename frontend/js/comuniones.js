@@ -611,9 +611,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // No es necesario duplicar el código aquí
 
     // Add event listeners for Excel operations
-    document.getElementById('descargarRegistro').addEventListener('click', downloadRegistros);
+    // Asegurarse de que solo haya un event listener para el botón de descarga
+const descargarBtn = document.getElementById('descargarRegistro');
+if (descargarBtn) {
+    // Eliminar todos los event listeners existentes
+    const nuevoBtn = descargarBtn.cloneNode(true);
+    descargarBtn.parentNode.replaceChild(nuevoBtn, descargarBtn);
+    // Agregar un único event listener
+    nuevoBtn.addEventListener('click', downloadRegistros);
+}
     
-    document.getElementById('cargarRegistro').addEventListener('click', () => {
+    document.getElementById('cargarRegistro')?.addEventListener('click', () => {
         document.getElementById('uploadExcel').click();
     });
 
@@ -858,19 +866,40 @@ document.querySelector('#comunionTable tbody').addEventListener('click', (e) => 
 
 async function downloadRegistros() {
     try {
+        mostrarCargando('Descargando todos los registros...');
         const token = localStorage.getItem('token');
-        const response = await fetch(`${API_URL}/comuniones/`, {
+        if (!token) {
+            throw new Error('No se encontró el token de autenticación');
+        }
+        
+        // Construir la URL completa manualmente para asegurar que sea correcta
+        // Usar getApiUrl para asegurar que la URL se construya correctamente
+        const url = getApiUrl('comunionesTodas');
+        console.log('Descargando registros desde:', url);
+        
+        const response = await fetch(url, {
+            method: 'GET',
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
             }
         });
 
         if (!response.ok) {
-            throw new Error(`Error al obtener datos: ${response.status}`);
+            const errorText = await response.text();
+            console.error('Error en la respuesta:', response.status, errorText);
+            throw new Error(`Error al obtener datos: ${response.status}. Detalles: ${errorText || 'No hay detalles disponibles'}`);
         }
 
         const responseData = await response.json();
         const registros = responseData.results || [];
+        
+        console.log(`Registros obtenidos: ${registros.length}`);
+        console.log('Estructura de la respuesta:', JSON.stringify(responseData).substring(0, 200) + '...');
+        
+        if (registros.length === 0) {
+            throw new Error('No se encontraron registros para descargar');
+        }
 
         // Format data for Excel
         const excelData = registros.map(record => ({
@@ -878,13 +907,13 @@ async function downloadRegistros() {
             'Folio': record.folio,
             'No. Partida': record.no_partida,
             'Nombre': record.nombre_comulgante,
-            'Fecha de Nacimiento': formatDate(record.fecha_nacimiento),
-            'Fecha de Comunión': formatDate(record.fecha_comunion),
-            'Nombre del Padre': record.nombre_padre,
-            'Nombre de la Madre': record.nombre_madre,
-            'Padrino': record.padrino,
-            'Madrina': record.madrina,
-            'Sacerdote': record.sacerdote,
+            'Fecha de Nacimiento': record.fecha_nacimiento ? record.fecha_nacimiento.split('T')[0] : '',
+            'Fecha de Comunión': record.fecha_comunion ? record.fecha_comunion.split('T')[0] : '',
+            'Nombre del Padre': record.nombre_padre || '',
+            'Nombre de la Madre': record.nombre_madre || '',
+            'Padrino': record.padrino || '',
+            'Madrina': record.madrina || '',
+            'Sacerdote': record.sacerdote || '',
             'Nota': record.nota || ''
         }));
 
@@ -917,10 +946,23 @@ async function downloadRegistros() {
 
         // Save file
         XLSX.writeFile(wb, fileName);
+        
+        // Ocultar indicador de carga
+        ocultarCargando();
+        
+        console.log('Descarga completada con éxito');
+        alert('Registros descargados correctamente');
 
     } catch (error) {
         console.error('Error al descargar registros:', error);
-        alert('Error al descargar registros: ' + error.message);
+        // Mostrar un mensaje más detallado al usuario
+        let errorMsg = 'Error al descargar registros: ' + error.message;
+        // Verificar si hay información adicional sobre el error
+        if (error.response) {
+            errorMsg += '\nCódigo de estado: ' + error.response.status;
+        }
+        alert(errorMsg);
+        ocultarCargando();
     }
 }
 
@@ -1147,9 +1189,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // No es necesario duplicar el código aquí
 
     // Add event listeners for Excel operations
-    document.getElementById('descargarRegistro').addEventListener('click', downloadRegistros);
+    // Asegurarse de que solo haya un event listener para el botón de descarga
+const descargarBtn = document.getElementById('descargarRegistro');
+if (descargarBtn) {
+    // Eliminar todos los event listeners existentes
+    const nuevoBtn = descargarBtn.cloneNode(true);
+    descargarBtn.parentNode.replaceChild(nuevoBtn, descargarBtn);
+    // Agregar un único event listener
+    nuevoBtn.addEventListener('click', downloadRegistros);
+}
     
-    document.getElementById('cargarRegistro').addEventListener('click', () => {
+    document.getElementById('cargarRegistro')?.addEventListener('click', () => {
         document.getElementById('uploadExcel').click();
     });
 
@@ -1301,15 +1351,29 @@ document.querySelector('#comunionTable tbody').addEventListener('click', (e) => 
 
 async function downloadRegistros() {
     try {
+        mostrarCargando('Descargando todos los registros...');
         const token = localStorage.getItem('token');
-        const response = await fetch(`${API_URL}/comuniones/`, {
+        if (!token) {
+            throw new Error('No se encontró el token de autenticación');
+        }
+        
+        // Construir la URL completa manualmente para asegurar que sea correcta
+        // Usar getApiUrl para asegurar que la URL se construya correctamente
+        const url = getApiUrl('comunionesTodas');
+        console.log('Descargando registros desde:', url);
+        
+        const response = await fetch(url, {
+            method: 'GET',
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
             }
         });
 
         if (!response.ok) {
-            throw new Error(`Error al obtener datos: ${response.status}`);
+            const errorText = await response.text();
+            console.error('Error en la respuesta:', response.status, errorText);
+            throw new Error(`Error al obtener datos: ${response.status}. Detalles: ${errorText || 'No hay detalles disponibles'}`);
         }
 
         const responseData = await response.json();
@@ -1360,10 +1424,18 @@ async function downloadRegistros() {
 
         // Save file
         XLSX.writeFile(wb, fileName);
+        ocultarCargando();
 
     } catch (error) {
         console.error('Error al descargar registros:', error);
-        alert('Error al descargar registros: ' + error.message);
+        // Mostrar un mensaje más detallado al usuario
+        let errorMsg = 'Error al descargar registros: ' + error.message;
+        // Verificar si hay información adicional sobre el error
+        if (error.response) {
+            errorMsg += '\nCódigo de estado: ' + error.response.status;
+        }
+        alert(errorMsg);
+        ocultarCargando();
     }
 }
 
@@ -1590,9 +1662,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // No es necesario duplicar el código aquí
 
     // Add event listeners for Excel operations
-    document.getElementById('descargarRegistro').addEventListener('click', downloadRegistros);
+    // Asegurarse de que solo haya un event listener para el botón de descarga
+const descargarBtn = document.getElementById('descargarRegistro');
+if (descargarBtn) {
+    // Eliminar todos los event listeners existentes
+    const nuevoBtn = descargarBtn.cloneNode(true);
+    descargarBtn.parentNode.replaceChild(nuevoBtn, descargarBtn);
+    // Agregar un único event listener
+    nuevoBtn.addEventListener('click', downloadRegistros);
+}
     
-    document.getElementById('cargarRegistro').addEventListener('click', () => {
+    document.getElementById('cargarRegistro')?.addEventListener('click', () => {
         document.getElementById('uploadExcel').click();
     });
 

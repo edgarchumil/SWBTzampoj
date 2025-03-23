@@ -9,6 +9,7 @@ var config = {
         bautismosCount: '/bautismo/count/',
         comuniones: '/comuniones/',
         comunionesCount: '/comunion/total/',
+        comunionesTodas: '/comuniones/todas/',
         confirmaciones: '/confirmacion/total',
         matrimonios: '/matrimonio/total',
         auth: '/auth/login/'
