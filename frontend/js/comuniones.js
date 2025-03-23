@@ -274,100 +274,6 @@ async function deleteComunion(id) {
 
 let allData = []; // Variable global para almacenar todos los datos
 
-async function loadComuniones(searchTerm = '') {
-    try {
-        mostrarCargando('Cargando registros de comuniones...');
-        const token = localStorage.getItem('token');
-        if (!token) {
-            window.location.href = 'login.html';
-            return;
-        }
-
-        // First request to get total count
-        const initialUrl = `${API_URL}/comuniones/`;
-
-        const initialResponse = await fetch(initialUrl, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!initialResponse.ok) {
-            throw new Error(`Error al cargar los datos: ${initialResponse.status}`);
-        }
-
-        const initialData = await initialResponse.json();
-        const totalRecords = initialData.count;
-        let allResults = [...initialData.results];
-
-        // Fetch remaining pages if any
-        if (initialData.next) {
-            let nextUrl = initialData.next;
-            while (nextUrl) {
-                const pageResponse = await fetch(nextUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!pageResponse.ok) {
-                    throw new Error(`Error al cargar los datos: ${pageResponse.status}`);
-                }
-
-                const pageData = await pageResponse.json();
-                allResults = [...allResults, ...pageData.results];
-                nextUrl = pageData.next;
-            }
-        }
-
-        // Sort all collected data
-        const sortedData = allResults.sort((a, b) => {
-            // First sort by libro
-            const libroA = parseInt(a.libro) || 0;
-            const libroB = parseInt(b.libro) || 0;
-            if (libroA !== libroB) {
-                return libroA - libroB;
-            }
-            
-            // If libro is equal, sort by folio
-            const folioA = parseInt(a.folio) || 0;
-            const folioB = parseInt(b.folio) || 0;
-            if (folioA !== folioB) {
-                return folioA - folioB;
-            }
-            
-            // If folio is equal, sort by no_partida
-            const partidaA = parseInt(a.no_partida) || 0;
-            const partidaB = parseInt(b.no_partida) || 0;
-            return partidaA - partidaB;
-        });
-
-        //console.log('Total records fetched:', allResults.length);
-        allData = sortedData; // Guardar los datos en la variable global
-        
-        // Si hay un término de búsqueda, filtrar los datos
-        if (searchTerm) {
-            const filteredData = allData.filter(comunion => 
-                comunion.nombre_comulgante.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            updateTable(filteredData);
-        } else {
-            updateTable(sortedData);
-        }
-        
-        ocultarCargando();
-
-    } catch (error) {
-        ocultarCargando();
-        console.error('Error al cargar datos:', error);
-        alert('Error al cargar los datos. Por favor, intente nuevamente.');
-    }
-}
-
 function updatePagination(responseData) {
     const anteriorBtn = document.getElementById('anterior');
     const siguienteBtn = document.getElementById('siguiente');
@@ -417,7 +323,7 @@ function updateTable(data) {
             row.innerHTML = `
                 <td class="text-center">${comunion.libro || ''}</td>
                 <td>${comunion.nombre_comulgante || ''}</td>
-                <td>${formatDate(comunion.fecha_nacimiento, true) || ''}</td>
+                <td>${formatearFecha(comunion.fecha_nacimiento) || ''}
                 <td class="text-center">${comunion.folio || ''}</td>
                 <td class="text-center">${comunion.no_partida || ''}</td>
                 <td>${comunion.nota || '-'}</td>
@@ -472,7 +378,7 @@ function updateTable(data) {
     });
 }
 
-async function loadComuniones(searchTerm = '') {
+async function loadComuniones(searchTerm = '', page = 1) {
     try {
         mostrarCargando('Cargando registros de comuniones...');
         const token = localStorage.getItem('token');
@@ -548,8 +454,20 @@ async function loadComuniones(searchTerm = '') {
             return partidaA - partidaB;
         });
 
+        // Guardar los datos en la variable global
+        allData = sortedData;
+        
+        // Si hay un término de búsqueda, filtrar los datos
+        if (searchTerm) {
+            const filteredData = allData.filter(comunion => 
+                comunion.nombre_comulgante.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            updateTable(filteredData);
+        } else {
+            updateTable(sortedData);
+        }
+        
         //console.log('Total records fetched:', allResults.length);
-        updateTable(sortedData);
         ocultarCargando();
 
     } catch (error) {
@@ -569,74 +487,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Marcar el formulario como inicializado
     const form = document.getElementById('comunionForm');
-    form.setAttribute('data-initialized', 'true');
-    
-    // Eliminar todos los event listeners existentes clonando el nodo
-    const newForm = form.cloneNode(true);
-    form.parentNode.replaceChild(newForm, form);
-    
-    // Obtener la referencia actualizada al formulario
-    const comunionForm = document.getElementById('comunionForm');
-    comunionForm.setAttribute('data-initialized', 'true');
-    
-    // Agregar un único event listener al formulario
-    comunionForm.addEventListener('submit', async function(e) {
-    
-    // Search input configuration
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.setAttribute('placeholder', 'Buscar por nombre...');
-        searchInput.style.cssText = `
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            width: 200px;
-            font-size: 14px;
-            margin: 10px 0;
-        `;
+    if (form) {
+        form.setAttribute('data-initialized', 'true');
         
-        // Agregar el event listener directamente aquí y asegurarse de que funcione
-        searchInput.addEventListener('input', function() {
-            //console.log('Evento de búsqueda activado');
-            const searchTerm = this.value.trim().toLowerCase();
-            filtrarRegistros(searchTerm);
-        });
-    }
-
-    // Modal elements and functions
-    const modal = document.getElementById('comunionModal');
-    const nuevoRegistroBtn = document.getElementById('nuevoRegistro');
-    const cancelBtn = modal.querySelector('.cancel');
-
-    function showModal() {
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }
-
-    function hideModal() {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-        document.getElementById('comunionForm').reset();
-        document.getElementById('comunionForm').dataset.editId = '';
-    }
-
-    // Event listeners
-    nuevoRegistroBtn.addEventListener('click', showModal);
-    cancelBtn.addEventListener('click', hideModal);
-    window.addEventListener('click', (event) => event.target === modal && hideModal());
-    document.addEventListener('keydown', (event) => event.key === 'Escape' && modal.style.display === 'block' && hideModal());
-
-    // Add initial data load
-    loadComuniones();  // Add this line to load data when page loads
-
-    // Form submit handler - ONLY ONE EVENT LISTENER TO PREVENT DUPLICATES
-    // Este código ya no se ejecutará porque hemos reemplazado el formulario y agregado un único listener arriba
-    // const form = document.getElementById('comunionForm');
-    // Remover cualquier event listener existente (no funciona directamente, pero es una buena práctica)
-    // form.replaceWith(form.cloneNode(true));
-    // Obtener la referencia actualizada después de clonar
-    // const newForm = document.getElementById('comunionForm');
-    // newForm.addEventListener('submit', async function(e) {
+        // Eliminar todos los event listeners existentes clonando el nodo
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        
+        // Obtener la referencia actualizada al formulario
+        const comunionForm = document.getElementById('comunionForm');
+        comunionForm.setAttribute('data-initialized', 'true');
+        
+        // Agregar un único event listener al formulario
+        comunionForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const formData = {
@@ -695,7 +558,57 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error al guardar:', error);
             alert('Error al guardar el registro: ' + error.message);
         }
-    }); // Close form submit handler
+    });
+    
+    // Search input configuration
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.setAttribute('placeholder', 'Buscar por nombre...');
+        searchInput.style.cssText = `
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            width: 200px;
+            font-size: 14px;
+            margin: 10px 0;
+        `;
+        
+        // Agregar el event listener directamente aquí y asegurarse de que funcione
+        searchInput.addEventListener('input', function() {
+            //console.log('Evento de búsqueda activado');
+            const searchTerm = this.value.trim().toLowerCase();
+            filtrarRegistros(searchTerm);
+        });
+    }
+
+    // Modal elements and functions
+    const modal = document.getElementById('comunionModal');
+    const nuevoRegistroBtn = document.getElementById('nuevoRegistro');
+    const cancelBtn = modal.querySelector('.cancel');
+
+    function showModal() {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function hideModal() {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        document.getElementById('comunionForm').reset();
+        document.getElementById('comunionForm').dataset.editId = '';
+    }
+
+    // Event listeners
+    nuevoRegistroBtn.addEventListener('click', showModal);
+    cancelBtn.addEventListener('click', hideModal);
+    window.addEventListener('click', (event) => event.target === modal && hideModal());
+    document.addEventListener('keydown', (event) => event.key === 'Escape' && modal.style.display === 'block' && hideModal());
+
+    // Add initial data load
+    loadComuniones();  // Add this line to load data when page loads
+
+    // Form submit handler - Ya implementado arriba
+    // No es necesario duplicar el código aquí
 
     // Add event listeners for Excel operations
     document.getElementById('descargarRegistro').addEventListener('click', downloadRegistros);
@@ -713,7 +626,9 @@ document.addEventListener('DOMContentLoaded', function() {
             e.target.value = ''; // Reset file input
         }
     });
-});
+}; // End of DOMContentLoaded event listener
+
+
 
 function searchTable() {
     const searchInput = document.getElementById('searchInput');
@@ -1108,74 +1023,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Marcar el formulario como inicializado
     const form = document.getElementById('comunionForm');
-    form.setAttribute('data-initialized', 'true');
-    
-    // Eliminar todos los event listeners existentes clonando el nodo
-    const newForm = form.cloneNode(true);
-    form.parentNode.replaceChild(newForm, form);
-    
-    // Obtener la referencia actualizada al formulario
-    const comunionForm = document.getElementById('comunionForm');
-    comunionForm.setAttribute('data-initialized', 'true');
-    
-    // Agregar un único event listener al formulario
-    comunionForm.addEventListener('submit', async function(e) {
-    
-    // Search input configuration
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.setAttribute('placeholder', 'Buscar por nombre...');
-        searchInput.style.cssText = `
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            width: 200px;
-            font-size: 14px;
-            margin: 10px 0;
-        `;
+    if (form) {
+        form.setAttribute('data-initialized', 'true');
         
-        // Agregar el event listener directamente aquí y asegurarse de que funcione
-        searchInput.addEventListener('input', function() {
-            //console.log('Evento de búsqueda activado');
-            const searchTerm = this.value.trim().toLowerCase();
-            filtrarRegistros(searchTerm);
-        });
-    }
-
-    // Modal elements and functions
-    const modal = document.getElementById('comunionModal');
-    const nuevoRegistroBtn = document.getElementById('nuevoRegistro');
-    const cancelBtn = modal.querySelector('.cancel');
-
-    function showModal() {
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }
-
-    function hideModal() {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-        document.getElementById('comunionForm').reset();
-        document.getElementById('comunionForm').dataset.editId = '';
-    }
-
-    // Event listeners
-    nuevoRegistroBtn.addEventListener('click', showModal);
-    cancelBtn.addEventListener('click', hideModal);
-    window.addEventListener('click', (event) => event.target === modal && hideModal());
-    document.addEventListener('keydown', (event) => event.key === 'Escape' && modal.style.display === 'block' && hideModal());
-
-    // Add initial data load
-    loadComuniones();  // Add this line to load data when page loads
-
-    // Form submit handler - ONLY ONE EVENT LISTENER TO PREVENT DUPLICATES
-    // Este código ya no se ejecutará porque hemos reemplazado el formulario y agregado un único listener arriba
-    // const form = document.getElementById('comunionForm');
-    // Remover cualquier event listener existente (no funciona directamente, pero es una buena práctica)
-    // form.replaceWith(form.cloneNode(true));
-    // Obtener la referencia actualizada después de clonar
-    // const newForm = document.getElementById('comunionForm');
-    // newForm.addEventListener('submit', async function(e) {
+        // Eliminar todos los event listeners existentes clonando el nodo
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        
+        // Obtener la referencia actualizada al formulario
+        const comunionForm = document.getElementById('comunionForm');
+        comunionForm.setAttribute('data-initialized', 'true');
+        
+        // Agregar un único event listener al formulario
+        comunionForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const formData = {
@@ -1234,7 +1094,57 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error al guardar:', error);
             alert('Error al guardar el registro: ' + error.message);
         }
-    }); // Close form submit handler
+    });
+    
+    // Search input configuration
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.setAttribute('placeholder', 'Buscar por nombre...');
+        searchInput.style.cssText = `
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            width: 200px;
+            font-size: 14px;
+            margin: 10px 0;
+        `;
+        
+        // Agregar el event listener directamente aquí y asegurarse de que funcione
+        searchInput.addEventListener('input', function() {
+            //console.log('Evento de búsqueda activado');
+            const searchTerm = this.value.trim().toLowerCase();
+            filtrarRegistros(searchTerm);
+        });
+    }
+
+    // Modal elements and functions
+    const modal = document.getElementById('comunionModal');
+    const nuevoRegistroBtn = document.getElementById('nuevoRegistro');
+    const cancelBtn = modal.querySelector('.cancel');
+
+    function showModal() {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function hideModal() {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        document.getElementById('comunionForm').reset();
+        document.getElementById('comunionForm').dataset.editId = '';
+    }
+
+    // Event listeners
+    nuevoRegistroBtn.addEventListener('click', showModal);
+    cancelBtn.addEventListener('click', hideModal);
+    window.addEventListener('click', (event) => event.target === modal && hideModal());
+    document.addEventListener('keydown', (event) => event.key === 'Escape' && modal.style.display === 'block' && hideModal());
+
+    // Add initial data load
+    loadComuniones();  // Add this line to load data when page loads
+
+    // Form submit handler - Ya implementado arriba
+    // No es necesario duplicar el código aquí
 
     // Add event listeners for Excel operations
     document.getElementById('descargarRegistro').addEventListener('click', downloadRegistros);
@@ -1252,7 +1162,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.target.value = ''; // Reset file input
         }
     });
-});
+};
 
 function searchTable() {
     const searchInput = document.getElementById('searchInput');
@@ -1556,74 +1466,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Marcar el formulario como inicializado
     const form = document.getElementById('comunionForm');
-    form.setAttribute('data-initialized', 'true');
-    
-    // Eliminar todos los event listeners existentes clonando el nodo
-    const newForm = form.cloneNode(true);
-    form.parentNode.replaceChild(newForm, form);
-    
-    // Obtener la referencia actualizada al formulario
-    const comunionForm = document.getElementById('comunionForm');
-    comunionForm.setAttribute('data-initialized', 'true');
-    
-    // Agregar un único event listener al formulario
-    comunionForm.addEventListener('submit', async function(e) {
-    
-    // Search input configuration
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.setAttribute('placeholder', 'Buscar por nombre...');
-        searchInput.style.cssText = `
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            width: 200px;
-            font-size: 14px;
-            margin: 10px 0;
-        `;
+    if (form) {
+        form.setAttribute('data-initialized', 'true');
         
-        // Agregar el event listener directamente aquí y asegurarse de que funcione
-        searchInput.addEventListener('input', function() {
-            //console.log('Evento de búsqueda activado');
-            const searchTerm = this.value.trim().toLowerCase();
-            filtrarRegistros(searchTerm);
-        });
-    }
-
-    // Modal elements and functions
-    const modal = document.getElementById('comunionModal');
-    const nuevoRegistroBtn = document.getElementById('nuevoRegistro');
-    const cancelBtn = modal.querySelector('.cancel');
-
-    function showModal() {
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }
-
-    function hideModal() {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-        document.getElementById('comunionForm').reset();
-        document.getElementById('comunionForm').dataset.editId = '';
-    }
-
-    // Event listeners
-    nuevoRegistroBtn.addEventListener('click', showModal);
-    cancelBtn.addEventListener('click', hideModal);
-    window.addEventListener('click', (event) => event.target === modal && hideModal());
-    document.addEventListener('keydown', (event) => event.key === 'Escape' && modal.style.display === 'block' && hideModal());
-
-    // Add initial data load
-    loadComuniones();  // Add this line to load data when page loads
-
-    // Form submit handler - ONLY ONE EVENT LISTENER TO PREVENT DUPLICATES
-    // Este código ya no se ejecutará porque hemos reemplazado el formulario y agregado un único listener arriba
-    // const form = document.getElementById('comunionForm');
-    // Remover cualquier event listener existente (no funciona directamente, pero es una buena práctica)
-    // form.replaceWith(form.cloneNode(true));
-    // Obtener la referencia actualizada después de clonar
-    // const newForm = document.getElementById('comunionForm');
-    // newForm.addEventListener('submit', async function(e) {
+        // Eliminar todos los event listeners existentes clonando el nodo
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        
+        // Obtener la referencia actualizada al formulario
+        const comunionForm = document.getElementById('comunionForm');
+        comunionForm.setAttribute('data-initialized', 'true');
+        
+        // Agregar un único event listener al formulario
+        comunionForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const formData = {
@@ -1682,7 +1537,57 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error al guardar:', error);
             alert('Error al guardar el registro: ' + error.message);
         }
-    }); // Close form submit handler
+    });
+    
+    // Search input configuration
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.setAttribute('placeholder', 'Buscar por nombre...');
+        searchInput.style.cssText = `
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            width: 200px;
+            font-size: 14px;
+            margin: 10px 0;
+        `;
+        
+        // Agregar el event listener directamente aquí y asegurarse de que funcione
+        searchInput.addEventListener('input', function() {
+            //console.log('Evento de búsqueda activado');
+            const searchTerm = this.value.trim().toLowerCase();
+            filtrarRegistros(searchTerm);
+        });
+    }
+
+    // Modal elements and functions
+    const modal = document.getElementById('comunionModal');
+    const nuevoRegistroBtn = document.getElementById('nuevoRegistro');
+    const cancelBtn = modal.querySelector('.cancel');
+
+    function showModal() {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function hideModal() {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        document.getElementById('comunionForm').reset();
+        document.getElementById('comunionForm').dataset.editId = '';
+    }
+
+    // Event listeners
+    nuevoRegistroBtn.addEventListener('click', showModal);
+    cancelBtn.addEventListener('click', hideModal);
+    window.addEventListener('click', (event) => event.target === modal && hideModal());
+    document.addEventListener('keydown', (event) => event.key === 'Escape' && modal.style.display === 'block' && hideModal());
+
+    // Add initial data load
+    loadComuniones();  // Add this line to load data when page loads
+
+    // Form submit handler - Ya implementado arriba
+    // No es necesario duplicar el código aquí
 
     // Add event listeners for Excel operations
     document.getElementById('descargarRegistro').addEventListener('click', downloadRegistros);
@@ -1700,7 +1605,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.target.value = ''; // Reset file input
         }
     });
-});
+};
 
 function searchTable() {
     const searchInput = document.getElementById('searchInput');
@@ -1798,4 +1703,5 @@ function showSearchSuggestions(suggestions) {
         });
         suggestionsContainer.appendChild(item);
     });
-}
+    } // End of showSearchSuggestions function
+})})}); // Close DOMContentLoaded event listener

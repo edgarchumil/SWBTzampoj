@@ -7,7 +7,8 @@ var config = {
     endpoints: {
         bautismos: '/bautismos/',
         bautismosCount: '/bautismo/count/',
-        comuniones: '/comunion/total/',
+        comuniones: '/comuniones/',
+        comunionesCount: '/comunion/total/',
         confirmaciones: '/confirmacion/total',
         matrimonios: '/matrimonio/total',
         auth: '/auth/login/'
