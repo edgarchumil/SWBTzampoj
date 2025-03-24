@@ -620,6 +620,135 @@ if (descargarBtn) {
     // Agregar un único event listener
     nuevoBtn.addEventListener('click', downloadRegistros);
 }
+
+async function downloadRegistros() {
+    try {
+        mostrarCargando('Preparando descarga de registros...');
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No se encontró el token de autenticación');
+        }
+
+        // Obtener todos los datos desde el servidor
+        const response = await fetch(`${API_URL}/comuniones/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error al obtener datos: ${response.status}`);
+        }
+
+        const initialData = await response.json();
+        let allResults = [...initialData.results];
+
+        // Fetch remaining pages if any
+        if (initialData.next) {
+            let nextUrl = initialData.next;
+            while (nextUrl) {
+                const pageResponse = await fetch(nextUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!pageResponse.ok) {
+                    throw new Error(`Error al cargar los datos: ${pageResponse.status}`);
+                }
+
+                const pageData = await pageResponse.json();
+                allResults = [...allResults, ...pageData.results];
+                nextUrl = pageData.next;
+            }
+        }
+
+        // Ordenar los datos por libro, folio y partida
+        const sortedData = allResults.sort((a, b) => {
+            // First sort by libro
+            const libroA = parseInt(a.libro) || 0;
+            const libroB = parseInt(b.libro) || 0;
+            if (libroA !== libroB) {
+                return libroA - libroB;
+            }
+            
+            // If libro is equal, sort by folio
+            const folioA = parseInt(a.folio) || 0;
+            const folioB = parseInt(b.folio) || 0;
+            if (folioA !== folioB) {
+                return folioA - folioB;
+            }
+            
+            // If folio is equal, sort by no_partida
+            const partidaA = parseInt(a.no_partida) || 0;
+            const partidaB = parseInt(b.no_partida) || 0;
+            return partidaA - partidaB;
+        });
+
+        // Si no hay datos, mostrar mensaje
+        if (sortedData.length === 0) {
+            alert('No hay datos para exportar');
+            ocultarCargando();
+            return;
+        }
+
+        // Formatear datos para Excel
+        const excelData = sortedData.map(comunion => ({
+            'Libro': comunion.libro || '',
+            'Folio': comunion.folio || '',
+            'No. Partida': comunion.no_partida || '',
+            'Nombre': comunion.nombre_comulgante || '',
+            'Fecha de Nacimiento': formatDate(comunion.fecha_nacimiento, true) || '',
+            'Fecha de Comunión': formatDate(comunion.fecha_comunion, true) || '',
+            'Nombre del Padre': comunion.nombre_padre || '',
+            'Nombre de la Madre': comunion.nombre_madre || '',
+            'Padrino': comunion.padrino || '',
+            'Madrina': comunion.madrina || '',
+            'Sacerdote': comunion.sacerdote || '',
+            'Nota': comunion.nota || ''
+        }));
+
+        // Crear libro de Excel
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(excelData);
+
+        // Establecer anchos de columna
+        const colWidths = [
+            { wch: 8 },  // Libro
+            { wch: 8 },  // Folio
+            { wch: 10 }, // No. Partida
+            { wch: 30 }, // Nombre
+            { wch: 15 }, // Fecha Nacimiento
+            { wch: 15 }, // Fecha Comunión
+            { wch: 30 }, // Nombre Padre
+            { wch: 30 }, // Nombre Madre
+            { wch: 25 }, // Padrino
+            { wch: 25 }, // Madrina
+            { wch: 25 }, // Sacerdote
+            { wch: 40 }  // Nota
+        ];
+        ws['!cols'] = colWidths;
+
+        // Añadir hoja al libro
+        XLSX.utils.book_append_sheet(wb, ws, "Registros de Comuniones");
+
+        // Generar nombre de archivo con fecha actual
+        const date = new Date().toISOString().split('T')[0];
+        const fileName = `Registros_Comuniones_${date}.xlsx`;
+
+        // Guardar archivo
+        XLSX.writeFile(wb, fileName);
+        ocultarCargando();
+    } catch (error) {
+        ocultarCargando();
+        console.error('Error al descargar registros:', error);
+        alert('Error al descargar registros: ' + error.message);
+    }
+}
     
     document.getElementById('cargarRegistro')?.addEventListener('click', () => {
         document.getElementById('uploadExcel').click();
@@ -864,108 +993,6 @@ document.querySelector('#comunionTable tbody').addEventListener('click', (e) => 
     }
 });
 
-async function downloadRegistros() {
-    try {
-        mostrarCargando('Descargando todos los registros...');
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('No se encontró el token de autenticación');
-        }
-        
-        // Construir la URL completa manualmente para asegurar que sea correcta
-        // Usar getApiUrl para asegurar que la URL se construya correctamente
-        const url = getApiUrl('comunionesTodas');
-        console.log('Descargando registros desde:', url);
-        
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Error en la respuesta:', response.status, errorText);
-            throw new Error(`Error al obtener datos: ${response.status}. Detalles: ${errorText || 'No hay detalles disponibles'}`);
-        }
-
-        const responseData = await response.json();
-        const registros = responseData.results || [];
-        
-        console.log(`Registros obtenidos: ${registros.length}`);
-        console.log('Estructura de la respuesta:', JSON.stringify(responseData).substring(0, 200) + '...');
-        
-        if (registros.length === 0) {
-            throw new Error('No se encontraron registros para descargar');
-        }
-
-        // Format data for Excel
-        const excelData = registros.map(record => ({
-            'Libro': record.libro,
-            'Folio': record.folio,
-            'No. Partida': record.no_partida,
-            'Nombre': record.nombre_comulgante,
-            'Fecha de Nacimiento': record.fecha_nacimiento ? record.fecha_nacimiento.split('T')[0] : '',
-            'Fecha de Comunión': record.fecha_comunion ? record.fecha_comunion.split('T')[0] : '',
-            'Nombre del Padre': record.nombre_padre || '',
-            'Nombre de la Madre': record.nombre_madre || '',
-            'Padrino': record.padrino || '',
-            'Madrina': record.madrina || '',
-            'Sacerdote': record.sacerdote || '',
-            'Nota': record.nota || ''
-        }));
-
-        // Create workbook
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.json_to_sheet(excelData);
-
-        // Set column widths
-        const colWidths = [
-            { wch: 8 },  // Libro
-            { wch: 8 },  // Folio
-            { wch: 10 }, // No. Partida
-            { wch: 30 }, // Nombre
-            { wch: 15 }, // Fecha Nacimiento
-            { wch: 15 }, // Fecha Comunión
-            { wch: 30 }, // Nombre Padre
-            { wch: 30 }, // Nombre Madre
-            { wch: 25 }, // Padrino
-            { wch: 25 }, // Madrina
-            { wch: 25 }, // Sacerdote
-            { wch: 40 }  // Nota
-        ];
-        ws['!cols'] = colWidths;
-
-        XLSX.utils.book_append_sheet(wb, ws, "Registros de Comuniones");
-
-        // Generate filename with current date
-        const date = new Date().toISOString().split('T')[0];
-        const fileName = `Registros_Comuniones_${date}.xlsx`;
-
-        // Save file
-        XLSX.writeFile(wb, fileName);
-        
-        // Ocultar indicador de carga
-        ocultarCargando();
-        
-        console.log('Descarga completada con éxito');
-        alert('Registros descargados correctamente');
-
-    } catch (error) {
-        console.error('Error al descargar registros:', error);
-        // Mostrar un mensaje más detallado al usuario
-        let errorMsg = 'Error al descargar registros: ' + error.message;
-        // Verificar si hay información adicional sobre el error
-        if (error.response) {
-            errorMsg += '\nCódigo de estado: ' + error.response.status;
-        }
-        alert(errorMsg);
-        ocultarCargando();
-    }
-}
-
 async function uploadRegistros(file) {
     try {
         const token = localStorage.getItem('token');
@@ -999,14 +1026,71 @@ async function uploadRegistros(file) {
                 let successCount = 0;
                 let errorCount = 0;
 
+                // Función para manejar fechas de manera segura
+                const safeFormatDate = (dateValue) => {
+                    if (!dateValue) return '';
+                    
+                    try {
+                        // Si es un número (fecha de Excel), convertirlo a fecha JavaScript
+                        if (typeof dateValue === 'number') {
+                            const excelDate = XLSX.SSF.parse_date_code(dateValue);
+                            if (excelDate && excelDate.y && excelDate.m && excelDate.d) {
+                                return `${excelDate.y}-${String(excelDate.m).padStart(2, '0')}-${String(excelDate.d).padStart(2, '0')}`;
+                            }
+                        }
+                        
+                        // Si es un string, intentar parsearlo
+                        if (typeof dateValue === 'string') {
+                            // Manejar formato español "dd de [mes] de yyyy"
+                            const mesesEspanol = {
+                                'enero': '01', 'febrero': '02', 'marzo': '03', 'abril': '04', 
+                                'mayo': '05', 'junio': '06', 'julio': '07', 'agosto': '08', 
+                                'septiembre': '09', 'octubre': '10', 'noviembre': '11', 'diciembre': '12'
+                            };
+                            
+                            const regexFechaEspanol = /(\d{1,2})\s+de\s+([a-zé]+)\s+de\s+(\d{4})/i;
+                            const coincidenciaEspanol = dateValue.match(regexFechaEspanol);
+                            
+                            if (coincidenciaEspanol) {
+                                const dia = String(coincidenciaEspanol[1]).padStart(2, '0');
+                                const nombreMes = coincidenciaEspanol[2].toLowerCase();
+                                const anio = coincidenciaEspanol[3];
+                                
+                                if (mesesEspanol[nombreMes]) {
+                                    return `${anio}-${mesesEspanol[nombreMes]}-${dia}`;
+                                }
+                            }
+                            
+                            // Verificar si tiene formato dd/mm/yyyy o dd-mm-yyyy
+                            if (/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/.test(dateValue)) {
+                                const partes = dateValue.split(/[\/\-]/);
+                                return `${partes[2]}-${String(partes[1]).padStart(2, '0')}-${String(partes[0]).padStart(2, '0')}`;
+                            }
+                            
+                            // Intentar con Date.parse
+                            const fechaParseada = new Date(dateValue);
+                            if (!isNaN(fechaParseada.getTime())) {
+                                return fechaParseada.toISOString().split('T')[0];
+                            }
+                        }
+                        
+                        // Si llegamos aquí, no pudimos parsear la fecha
+                        console.warn(`No se pudo parsear la fecha: ${dateValue}`);
+                        return '';
+                    } catch (error) {
+                        console.error(`Error al procesar fecha ${dateValue}:`, error);
+                        return '';
+                    }
+                };
+
                 // Transform Excel data to match API format
                 const formattedData = jsonData.map(row => ({
-                    libro: parseInt(row['Libro']) || 0,
-                    folio: parseInt(row['Folio']) || 0,
-                    no_partida: parseInt(row['No. Partida']) || 0,
+                    libro: (row['Libro'] || '0').toString(),
+                    folio: (row['Folio'] || '0').toString(),
+                    no_partida: (row['No. Partida'] || '0').toString(),
                     nombre_comulgante: (row['Nombre'] || '').toString().trim(),
-                    fecha_nacimiento: row['Fecha de Nacimiento'] || '',
-                    fecha_comunion: row['Fecha de Comunión'] || '',
+                    fecha_nacimiento: safeFormatDate(row['Fecha de Nacimiento']),
+                    fecha_comunion: safeFormatDate(row['Fecha de Comunión']),
                     nombre_padre: (row['Nombre del Padre'] || '').toString().trim(),
                     nombre_madre: (row['Nombre de la Madre'] || '').toString().trim(),
                     padrino: (row['Padrino'] || '').toString().trim(),
@@ -1018,6 +1102,9 @@ async function uploadRegistros(file) {
                 // Process each record
                 for (const record of formattedData) {
                     try {
+                        // Mostrar datos que se están enviando para depuración
+                        console.log('Enviando registro:', record);
+                        
                         const response = await fetch(`${API_URL}/comuniones/`, {
                             method: 'POST',
                             headers: {
@@ -1026,6 +1113,11 @@ async function uploadRegistros(file) {
                             },
                             body: JSON.stringify(record)
                         });
+                        
+                        if (!response.ok) {
+                            const errorData = await response.text();
+                            console.error('Error en respuesta del servidor:', errorData);
+                        }
 
                         if (response.ok) {
                             successCount++;
@@ -1197,6 +1289,135 @@ if (descargarBtn) {
     descargarBtn.parentNode.replaceChild(nuevoBtn, descargarBtn);
     // Agregar un único event listener
     nuevoBtn.addEventListener('click', downloadRegistros);
+}
+
+async function downloadRegistros() {
+    try {
+        mostrarCargando('Preparando descarga de registros...');
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No se encontró el token de autenticación');
+        }
+
+        // Obtener todos los datos desde el servidor
+        const response = await fetch(`${API_URL}/comuniones/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error al obtener datos: ${response.status}`);
+        }
+
+        const initialData = await response.json();
+        let allResults = [...initialData.results];
+
+        // Fetch remaining pages if any
+        if (initialData.next) {
+            let nextUrl = initialData.next;
+            while (nextUrl) {
+                const pageResponse = await fetch(nextUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!pageResponse.ok) {
+                    throw new Error(`Error al cargar los datos: ${pageResponse.status}`);
+                }
+
+                const pageData = await pageResponse.json();
+                allResults = [...allResults, ...pageData.results];
+                nextUrl = pageData.next;
+            }
+        }
+
+        // Ordenar los datos por libro, folio y partida
+        const sortedData = allResults.sort((a, b) => {
+            // First sort by libro
+            const libroA = parseInt(a.libro) || 0;
+            const libroB = parseInt(b.libro) || 0;
+            if (libroA !== libroB) {
+                return libroA - libroB;
+            }
+            
+            // If libro is equal, sort by folio
+            const folioA = parseInt(a.folio) || 0;
+            const folioB = parseInt(b.folio) || 0;
+            if (folioA !== folioB) {
+                return folioA - folioB;
+            }
+            
+            // If folio is equal, sort by no_partida
+            const partidaA = parseInt(a.no_partida) || 0;
+            const partidaB = parseInt(b.no_partida) || 0;
+            return partidaA - partidaB;
+        });
+
+        // Si no hay datos, mostrar mensaje
+        if (sortedData.length === 0) {
+            alert('No hay datos para exportar');
+            ocultarCargando();
+            return;
+        }
+
+        // Formatear datos para Excel
+        const excelData = sortedData.map(comunion => ({
+            'Libro': comunion.libro || '',
+            'Folio': comunion.folio || '',
+            'No. Partida': comunion.no_partida || '',
+            'Nombre': comunion.nombre_comulgante || '',
+            'Fecha de Nacimiento': formatDate(comunion.fecha_nacimiento, true) || '',
+            'Fecha de Comunión': formatDate(comunion.fecha_comunion, true) || '',
+            'Nombre del Padre': comunion.nombre_padre || '',
+            'Nombre de la Madre': comunion.nombre_madre || '',
+            'Padrino': comunion.padrino || '',
+            'Madrina': comunion.madrina || '',
+            'Sacerdote': comunion.sacerdote || '',
+            'Nota': comunion.nota || ''
+        }));
+
+        // Crear libro de Excel
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(excelData);
+
+        // Establecer anchos de columna
+        const colWidths = [
+            { wch: 8 },  // Libro
+            { wch: 8 },  // Folio
+            { wch: 10 }, // No. Partida
+            { wch: 30 }, // Nombre
+            { wch: 15 }, // Fecha Nacimiento
+            { wch: 15 }, // Fecha Comunión
+            { wch: 30 }, // Nombre Padre
+            { wch: 30 }, // Nombre Madre
+            { wch: 25 }, // Padrino
+            { wch: 25 }, // Madrina
+            { wch: 25 }, // Sacerdote
+            { wch: 40 }  // Nota
+        ];
+        ws['!cols'] = colWidths;
+
+        // Añadir hoja al libro
+        XLSX.utils.book_append_sheet(wb, ws, "Registros de Comuniones");
+
+        // Generar nombre de archivo con fecha actual
+        const date = new Date().toISOString().split('T')[0];
+        const fileName = `Registros_Comuniones_${date}.xlsx`;
+
+        // Guardar archivo
+        XLSX.writeFile(wb, fileName);
+        ocultarCargando();
+    } catch (error) {
+        ocultarCargando();
+        console.error('Error al descargar registros:', error);
+        alert('Error al descargar registros: ' + error.message);
+    }
 }
     
     document.getElementById('cargarRegistro')?.addEventListener('click', () => {
@@ -1349,96 +1570,6 @@ document.querySelector('#comunionTable tbody').addEventListener('click', (e) => 
     }
 });
 
-async function downloadRegistros() {
-    try {
-        mostrarCargando('Descargando todos los registros...');
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('No se encontró el token de autenticación');
-        }
-        
-        // Construir la URL completa manualmente para asegurar que sea correcta
-        // Usar getApiUrl para asegurar que la URL se construya correctamente
-        const url = getApiUrl('comunionesTodas');
-        console.log('Descargando registros desde:', url);
-        
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Error en la respuesta:', response.status, errorText);
-            throw new Error(`Error al obtener datos: ${response.status}. Detalles: ${errorText || 'No hay detalles disponibles'}`);
-        }
-
-        const responseData = await response.json();
-        const registros = responseData.results || [];
-
-        // Format data for Excel
-        const excelData = registros.map(record => ({
-            'Libro': record.libro,
-            'Folio': record.folio,
-            'No. Partida': record.no_partida,
-            'Nombre': record.nombre_comulgante,
-            'Fecha de Nacimiento': formatDate(record.fecha_nacimiento),
-            'Fecha de Comunión': formatDate(record.fecha_comunion),
-            'Nombre del Padre': record.nombre_padre,
-            'Nombre de la Madre': record.nombre_madre,
-            'Padrino': record.padrino,
-            'Madrina': record.madrina,
-            'Sacerdote': record.sacerdote,
-            'Nota': record.nota || ''
-        }));
-
-        // Create workbook
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.json_to_sheet(excelData);
-
-        // Set column widths
-        const colWidths = [
-            { wch: 8 },  // Libro
-            { wch: 8 },  // Folio
-            { wch: 10 }, // No. Partida
-            { wch: 30 }, // Nombre
-            { wch: 15 }, // Fecha Nacimiento
-            { wch: 15 }, // Fecha Comunión
-            { wch: 30 }, // Nombre Padre
-            { wch: 30 }, // Nombre Madre
-            { wch: 25 }, // Padrino
-            { wch: 25 }, // Madrina
-            { wch: 25 }, // Sacerdote
-            { wch: 40 }  // Nota
-        ];
-        ws['!cols'] = colWidths;
-
-        XLSX.utils.book_append_sheet(wb, ws, "Registros de Comuniones");
-
-        // Generate filename with current date
-        const date = new Date().toISOString().split('T')[0];
-        const fileName = `Registros_Comuniones_${date}.xlsx`;
-
-        // Save file
-        XLSX.writeFile(wb, fileName);
-        ocultarCargando();
-
-    } catch (error) {
-        console.error('Error al descargar registros:', error);
-        // Mostrar un mensaje más detallado al usuario
-        let errorMsg = 'Error al descargar registros: ' + error.message;
-        // Verificar si hay información adicional sobre el error
-        if (error.response) {
-            errorMsg += '\nCódigo de estado: ' + error.response.status;
-        }
-        alert(errorMsg);
-        ocultarCargando();
-    }
-}
-
 async function uploadRegistros(file) {
     try {
         const token = localStorage.getItem('token');
@@ -1472,14 +1603,71 @@ async function uploadRegistros(file) {
                 let successCount = 0;
                 let errorCount = 0;
 
+                // Función para manejar fechas de manera segura
+                const safeFormatDate = (dateValue) => {
+                    if (!dateValue) return '';
+                    
+                    try {
+                        // Si es un número (fecha de Excel), convertirlo a fecha JavaScript
+                        if (typeof dateValue === 'number') {
+                            const excelDate = XLSX.SSF.parse_date_code(dateValue);
+                            if (excelDate && excelDate.y && excelDate.m && excelDate.d) {
+                                return `${excelDate.y}-${String(excelDate.m).padStart(2, '0')}-${String(excelDate.d).padStart(2, '0')}`;
+                            }
+                        }
+                        
+                        // Si es un string, intentar parsearlo
+                        if (typeof dateValue === 'string') {
+                            // Manejar formato español "dd de [mes] de yyyy"
+                            const mesesEspanol = {
+                                'enero': '01', 'febrero': '02', 'marzo': '03', 'abril': '04', 
+                                'mayo': '05', 'junio': '06', 'julio': '07', 'agosto': '08', 
+                                'septiembre': '09', 'octubre': '10', 'noviembre': '11', 'diciembre': '12'
+                            };
+                            
+                            const regexFechaEspanol = /(\d{1,2})\s+de\s+([a-zé]+)\s+de\s+(\d{4})/i;
+                            const coincidenciaEspanol = dateValue.match(regexFechaEspanol);
+                            
+                            if (coincidenciaEspanol) {
+                                const dia = String(coincidenciaEspanol[1]).padStart(2, '0');
+                                const nombreMes = coincidenciaEspanol[2].toLowerCase();
+                                const anio = coincidenciaEspanol[3];
+                                
+                                if (mesesEspanol[nombreMes]) {
+                                    return `${anio}-${mesesEspanol[nombreMes]}-${dia}`;
+                                }
+                            }
+                            
+                            // Verificar si tiene formato dd/mm/yyyy o dd-mm-yyyy
+                            if (/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/.test(dateValue)) {
+                                const partes = dateValue.split(/[\/\-]/);
+                                return `${partes[2]}-${String(partes[1]).padStart(2, '0')}-${String(partes[0]).padStart(2, '0')}`;
+                            }
+                            
+                            // Intentar con Date.parse
+                            const fechaParseada = new Date(dateValue);
+                            if (!isNaN(fechaParseada.getTime())) {
+                                return fechaParseada.toISOString().split('T')[0];
+                            }
+                        }
+                        
+                        // Si llegamos aquí, no pudimos parsear la fecha
+                        console.warn(`No se pudo parsear la fecha: ${dateValue}`);
+                        return '';
+                    } catch (error) {
+                        console.error(`Error al procesar fecha ${dateValue}:`, error);
+                        return '';
+                    }
+                };
+
                 // Transform Excel data to match API format
                 const formattedData = jsonData.map(row => ({
-                    libro: parseInt(row['Libro']) || 0,
-                    folio: parseInt(row['Folio']) || 0,
-                    no_partida: parseInt(row['No. Partida']) || 0,
+                    libro: (row['Libro'] || '0').toString(),
+                    folio: (row['Folio'] || '0').toString(),
+                    no_partida: (row['No. Partida'] || '0').toString(),
                     nombre_comulgante: (row['Nombre'] || '').toString().trim(),
-                    fecha_nacimiento: row['Fecha de Nacimiento'] || '',
-                    fecha_comunion: row['Fecha de Comunión'] || '',
+                    fecha_nacimiento: safeFormatDate(row['Fecha de Nacimiento']),
+                    fecha_comunion: safeFormatDate(row['Fecha de Comunión']),
                     nombre_padre: (row['Nombre del Padre'] || '').toString().trim(),
                     nombre_madre: (row['Nombre de la Madre'] || '').toString().trim(),
                     padrino: (row['Padrino'] || '').toString().trim(),
@@ -1491,6 +1679,9 @@ async function uploadRegistros(file) {
                 // Process each record
                 for (const record of formattedData) {
                     try {
+                        // Mostrar datos que se están enviando para depuración
+                        console.log('Enviando registro:', record);
+                        
                         const response = await fetch(`${API_URL}/comuniones/`, {
                             method: 'POST',
                             headers: {
@@ -1499,6 +1690,11 @@ async function uploadRegistros(file) {
                             },
                             body: JSON.stringify(record)
                         });
+                        
+                        if (!response.ok) {
+                            const errorData = await response.text();
+                            console.error('Error en respuesta del servidor:', errorData);
+                        }
 
                         if (response.ok) {
                             successCount++;
@@ -1670,6 +1866,135 @@ if (descargarBtn) {
     descargarBtn.parentNode.replaceChild(nuevoBtn, descargarBtn);
     // Agregar un único event listener
     nuevoBtn.addEventListener('click', downloadRegistros);
+}
+
+async function downloadRegistros() {
+    try {
+        mostrarCargando('Preparando descarga de registros...');
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No se encontró el token de autenticación');
+        }
+
+        // Obtener todos los datos desde el servidor
+        const response = await fetch(`${API_URL}/comuniones/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error al obtener datos: ${response.status}`);
+        }
+
+        const initialData = await response.json();
+        let allResults = [...initialData.results];
+
+        // Fetch remaining pages if any
+        if (initialData.next) {
+            let nextUrl = initialData.next;
+            while (nextUrl) {
+                const pageResponse = await fetch(nextUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!pageResponse.ok) {
+                    throw new Error(`Error al cargar los datos: ${pageResponse.status}`);
+                }
+
+                const pageData = await pageResponse.json();
+                allResults = [...allResults, ...pageData.results];
+                nextUrl = pageData.next;
+            }
+        }
+
+        // Ordenar los datos por libro, folio y partida
+        const sortedData = allResults.sort((a, b) => {
+            // First sort by libro
+            const libroA = parseInt(a.libro) || 0;
+            const libroB = parseInt(b.libro) || 0;
+            if (libroA !== libroB) {
+                return libroA - libroB;
+            }
+            
+            // If libro is equal, sort by folio
+            const folioA = parseInt(a.folio) || 0;
+            const folioB = parseInt(b.folio) || 0;
+            if (folioA !== folioB) {
+                return folioA - folioB;
+            }
+            
+            // If folio is equal, sort by no_partida
+            const partidaA = parseInt(a.no_partida) || 0;
+            const partidaB = parseInt(b.no_partida) || 0;
+            return partidaA - partidaB;
+        });
+
+        // Si no hay datos, mostrar mensaje
+        if (sortedData.length === 0) {
+            alert('No hay datos para exportar');
+            ocultarCargando();
+            return;
+        }
+
+        // Formatear datos para Excel
+        const excelData = sortedData.map(comunion => ({
+            'Libro': comunion.libro || '',
+            'Folio': comunion.folio || '',
+            'No. Partida': comunion.no_partida || '',
+            'Nombre': comunion.nombre_comulgante || '',
+            'Fecha de Nacimiento': formatDate(comunion.fecha_nacimiento, true) || '',
+            'Fecha de Comunión': formatDate(comunion.fecha_comunion, true) || '',
+            'Nombre del Padre': comunion.nombre_padre || '',
+            'Nombre de la Madre': comunion.nombre_madre || '',
+            'Padrino': comunion.padrino || '',
+            'Madrina': comunion.madrina || '',
+            'Sacerdote': comunion.sacerdote || '',
+            'Nota': comunion.nota || ''
+        }));
+
+        // Crear libro de Excel
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(excelData);
+
+        // Establecer anchos de columna
+        const colWidths = [
+            { wch: 8 },  // Libro
+            { wch: 8 },  // Folio
+            { wch: 10 }, // No. Partida
+            { wch: 30 }, // Nombre
+            { wch: 15 }, // Fecha Nacimiento
+            { wch: 15 }, // Fecha Comunión
+            { wch: 30 }, // Nombre Padre
+            { wch: 30 }, // Nombre Madre
+            { wch: 25 }, // Padrino
+            { wch: 25 }, // Madrina
+            { wch: 25 }, // Sacerdote
+            { wch: 40 }  // Nota
+        ];
+        ws['!cols'] = colWidths;
+
+        // Añadir hoja al libro
+        XLSX.utils.book_append_sheet(wb, ws, "Registros de Comuniones");
+
+        // Generar nombre de archivo con fecha actual
+        const date = new Date().toISOString().split('T')[0];
+        const fileName = `Registros_Comuniones_${date}.xlsx`;
+
+        // Guardar archivo
+        XLSX.writeFile(wb, fileName);
+        ocultarCargando();
+    } catch (error) {
+        ocultarCargando();
+        console.error('Error al descargar registros:', error);
+        alert('Error al descargar registros: ' + error.message);
+    }
 }
     
     document.getElementById('cargarRegistro')?.addEventListener('click', () => {
