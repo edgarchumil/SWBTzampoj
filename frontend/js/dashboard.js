@@ -97,6 +97,7 @@ if (typeof config === 'undefined') {
 const API_ROUTES = {
     bautismos: `${config.apiUrl}${config.endpoints.bautismosCount}`,
     comuniones: `${config.apiUrl}${config.endpoints.comuniones}`,
+    comunionesCount: `${config.apiUrl}${config.endpoints.comunionesCount}`,
     confirmaciones: `${config.apiUrl}${config.endpoints.confirmaciones}`,
     matrimonios: `${config.apiUrl}${config.endpoints.matrimonios}`
 };
@@ -136,8 +137,8 @@ async function actualizarContadorBautismos() {
 
 async function actualizarContadorPrimerasComuniones() {
     try {
-        //console.log('🌐 Verificando ruta de comuniones:', API_ROUTES.comuniones);
-        const response = await fetch(API_ROUTES.comuniones, {
+        //console.log('🌐 Verificando ruta de comuniones:', API_ROUTES.comunionesCount);
+        const response = await fetch(API_ROUTES.comunionesCount, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
