@@ -1,6 +1,8 @@
 // Definir URL base de la API usando la configuración centralizada
 var API_URL = config.apiUrl;
 
+// Referencia al controlador global de certificados
+
 // Función para formatear fechas en formato español
 function formatearFecha(fecha) {
     if (!fecha) return '';
@@ -365,17 +367,6 @@ function updateTable(data) {
     } else {
         tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">No hay datos registrados</td></tr>';
     }
-
-    // Add constancia button listeners
-    const constanciaButtons = tbody.querySelectorAll('.btn-constancia');
-    constanciaButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const id = button.dataset.id;
-            if (id) {
-                certificadoController.generarConstancia(id);
-            }
-        });
-    });
 }
 
 async function loadComuniones(searchTerm = '', page = 1) {
@@ -960,8 +951,11 @@ document.querySelector('#comunionTable tbody').addEventListener('click', (e) => 
     const target = e.target;
     if (target.classList.contains('btn-constancia')) {
         const id = target.dataset.id;
-        if (id) {
+        if (id && typeof certificadoController !== 'undefined') {
             certificadoController.generarConstancia(id);
+        } else if (id) {
+            console.error('certificadoController no está definido');
+            alert('Error: No se puede generar la constancia en este momento. Por favor, recargue la página.');
         }
     }
 });
@@ -982,16 +976,6 @@ async function fetchWithAuth(url, options = {}) {
         }
     });
 }
-
-document.querySelector('#comunionTable tbody').addEventListener('click', (e) => {
-    const target = e.target;
-    if (target.classList.contains('btn-constancia')) {
-        const id = target.dataset.id;
-        if (id) {
-            certificadoController.generarConstancia(id);
-        }
-    }
-});
 
 async function uploadRegistros(file) {
     try {
@@ -1537,8 +1521,11 @@ document.querySelector('#comunionTable tbody').addEventListener('click', (e) => 
     const target = e.target;
     if (target.classList.contains('btn-constancia')) {
         const id = target.dataset.id;
-        if (id) {
+        if (id && typeof certificadoController !== 'undefined') {
             certificadoController.generarConstancia(id);
+        } else if (id) {
+            console.error('certificadoController no está definido');
+            alert('Error: No se puede generar la constancia en este momento. Por favor, recargue la página.');
         }
     }
 });
@@ -1559,16 +1546,6 @@ async function fetchWithAuth(url, options = {}) {
         }
     });
 }
-
-document.querySelector('#comunionTable tbody').addEventListener('click', (e) => {
-    const target = e.target;
-    if (target.classList.contains('btn-constancia')) {
-        const id = target.dataset.id;
-        if (id) {
-            certificadoController.generarConstancia(id);
-        }
-    }
-});
 
 async function uploadRegistros(file) {
     try {
@@ -2049,6 +2026,8 @@ function hideSearchSuggestions() {
     }
 }
 
+// Referencia al controlador global de certificados
+
 function showSearchSuggestions(suggestions) {
     let suggestionsContainer = document.getElementById('searchSuggestions');
     
@@ -2108,5 +2087,5 @@ function showSearchSuggestions(suggestions) {
         });
         suggestionsContainer.appendChild(item);
     });
-    } // End of showSearchSuggestions function
-})})}); // Close DOMContentLoaded event listener
+}
+})})})
