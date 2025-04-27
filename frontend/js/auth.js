@@ -1,35 +1,35 @@
-function verificarSesion() {
-    const token = localStorage.getItem('token');
-    const lastActivity = parseInt(localStorage.getItem('lastActivity') || '0');
-    const tiempoInactivo = new Date().getTime() - lastActivity;
-    
-    // Verificar token y tiempo de inactividad (30 minutos)
-    if (!token || tiempoInactivo > 30 * 60 * 1000) {
-        cerrarSesion();
-        return false;
-    }
+// Este archivo está obsoleto y ha sido reemplazado por auth-utils.js
+// Se mantiene por compatibilidad con versiones anteriores
 
-    // Actualizar tiempo de actividad
-    actualizarActividad();
+// Redirigir a las funciones en auth-utils.js para evitar duplicación
+function verificarSesion() {
+    // Usar la función de auth-utils.js si está disponible
+    if (typeof window.verificarSesion === 'function') {
+        return window.verificarSesion();
+    }
+    
+    // Implementación de respaldo por si auth-utils.js no está cargado
+    const token = localStorage.getItem('token');
+    if (!token) return false;
     return true;
 }
 
 function actualizarActividad() {
-    localStorage.setItem('lastActivity', new Date().getTime());
+    // No hacer nada, esta funcionalidad ahora está en auth-utils.js
+    // Evitar duplicar listeners de eventos
 }
 
 function cerrarSesion() {
-    try {
-        // Limpiar datos de sesión
-        localStorage.clear();
-        // Redirigir al login
-        window.location.replace('index.html');
-    } catch (error) {
-        console.error('Error al cerrar sesión:', error);
+    // Usar la función de auth-utils.js si está disponible
+    if (typeof window.cerrarSesion === 'function') {
+        window.cerrarSesion();
+        return;
     }
+    
+    // Implementación de respaldo
+    localStorage.clear();
+    window.location.href = 'index.html';
 }
 
-// Agregar listeners para actividad
-document.addEventListener('click', actualizarActividad);
-document.addEventListener('keypress', actualizarActividad);
-document.addEventListener('mousemove', actualizarActividad);
+// No agregar listeners duplicados
+// Los listeners ahora se manejan en auth-utils.js

@@ -15,8 +15,18 @@ async function actualizarContadores() {
 
 document.addEventListener('DOMContentLoaded', async function() {
     try {
-        // Inicializar autenticación con todas las opciones predeterminadas
-        if (!inicializarAutenticacion()) {
+        // Verificar si ya hay una sesión activa antes de inicializar la autenticación completa
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = 'index.html';
+            return;
+        }
+        
+        // Inicializar autenticación con verificación periódica menos frecuente para evitar parpadeos
+        if (!inicializarAutenticacion({
+            verificacionPeriodica: true,
+            intervaloVerificacion: 300000 // Verificar cada 5 minutos en lugar de cada minuto
+        })) {
             return; // Si la autenticación falla, detener la ejecución
         }
 

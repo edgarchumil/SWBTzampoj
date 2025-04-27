@@ -15,7 +15,8 @@ function verificarSesion() {
     
     // Verificar token y tiempo de inactividad (30 minutos)
     if (!token || tiempoInactivo > 30 * 60 * 1000) {
-        cerrarSesion();
+        // En lugar de redirigir inmediatamente, solo devolver false
+        // para que la página que llama pueda decidir qué hacer
         return false;
     }
 
@@ -50,11 +51,9 @@ function cerrarSesion() {
  * Si no hay sesión, redirecciona al login
  */
 function protegerRuta() {
-    if (!verificarSesion()) {
-        window.location.href = 'index.html';
-        return false;
-    }
-    return true;
+    // Solo verificar si hay sesión sin redirigir automáticamente
+    // Esto evita redirecciones innecesarias que causan parpadeo
+    return verificarSesion();
 }
 
 /**
@@ -102,14 +101,27 @@ function inicializarAutenticacion(opciones = {}) {
         verificacionPeriodica: true,
         intervaloVerificacion: 60000,
         configurarLogout: true,
-        selectorLogout: '#logout'
+        selectorLogout: '#logout',
+        redireccionarEnFallo: true,
+        paginaLogin: 'index.html'
     };
 
     // Combinar opciones proporcionadas con las predeterminadas
     Object.assign(config, opciones);
 
+    // Verificar sesión sin redirigir automáticamente
+    const sesionValida = verificarSesion();
+    
     // Proteger la página si es necesario
-    if (config.protegerPagina && !protegerRuta()) {
+    if (config.protegerPagina && !sesionValida) {
+        // Solo redirigir si la opción está habilitada
+        if (config.redireccionarEnFallo) {
+            // Usar una redirección más suave para evitar parpadeos
+            if (window.location.pathname.indexOf(config.paginaLogin) === -1) {
+                window.location.replace(config.paginaLogin);
+            }
+            return false;
+        }
         return false;
     }
 
@@ -118,9 +130,22 @@ function inicializarAutenticacion(opciones = {}) {
         configurarListenersActividad();
     }
 
-    // Configurar verificación periódica
+    // Configurar verificación periódica con un debounce para evitar múltiples redirecciones
     if (config.verificacionPeriodica) {
-        configurarVerificacionPeriodica(config.intervaloVerificacion);
+        let redireccionPendiente = false;
+        const verificarConDebounce = () => {
+            if (!verificarSesion() && !redireccionPendiente && config.redireccionarEnFallo) {
+                redireccionPendiente = true;
+                setTimeout(() => {
+                    if (!verificarSesion()) {
+                        window.location.replace(config.paginaLogin);
+                    } else {
+                        redireccionPendiente = false;
+                    }
+                }, 1000); // Esperar 1 segundo antes de redirigir
+            }
+        };
+        setInterval(verificarConDebounce, config.intervaloVerificacion);
     }
 
     // Configurar botón de logout
