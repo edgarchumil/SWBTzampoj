@@ -13,9 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    // Verificar si ya hay una sesión activa
-    const token = localStorage.getItem('token');
-    if (token) {
+    // Verificar si ya hay una sesión activa y redirigir al dashboard
+    if (verificarSesion()) {
         window.location.href = 'dashboard.html';
         return;
     }

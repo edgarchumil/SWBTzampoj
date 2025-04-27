@@ -1,14 +1,5 @@
 // Funciones de utilidad
 
-async function verificarSesion() {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        window.location.href = 'login.html';
-        return false;
-    }
-    return true;
-}
-
 async function actualizarContadores() {
     try {
         await Promise.all([
@@ -24,8 +15,9 @@ async function actualizarContadores() {
 
 document.addEventListener('DOMContentLoaded', async function() {
     try {
-        if (!await verificarSesion()) {
-            return;
+        // Inicializar autenticación con todas las opciones predeterminadas
+        if (!inicializarAutenticacion()) {
+            return; // Si la autenticación falla, detener la ejecución
         }
 
         const username = localStorage.getItem('username');
@@ -36,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         inicializarSidebar();
         await actualizarContadores();
 
-        setInterval(verificarSesion, 60000);
+        // Configurar actualización periódica de contadores
         setInterval(actualizarContadores, 300000);
 
     } catch (error) {
@@ -44,20 +36,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 });
 
-document.getElementById('logout').addEventListener('click', function() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    window.location.href = './index.html'; // Cambiado a ruta relativa
-});
-
-function actualizarActividad() {
-    localStorage.setItem('lastActivity', new Date().getTime());
-}
-
-function cerrarSesion() {
-    localStorage.clear();
-    window.location.href = '/index.html'; // Cambiado a ruta relativa
-}
+// El botón de logout ahora se maneja a través de auth-utils.js
 
 function inicializarSidebar() {
     const sidebar = document.getElementById('sidebar');

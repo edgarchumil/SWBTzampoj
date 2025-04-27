@@ -215,7 +215,14 @@ async function loadBautismosTable() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', loadBautismosTable);
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar autenticación con todas las opciones predeterminadas
+    if (!inicializarAutenticacion()) {
+        return; // Si la autenticación falla, detener la ejecución
+    }
+    
+    loadBautismosTable();
+});
 
 function abrirModal(isEditing = false) {
     const modal = document.getElementById('bautismoModal');
